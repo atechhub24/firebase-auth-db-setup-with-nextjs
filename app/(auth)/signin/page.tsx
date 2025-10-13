@@ -46,6 +46,9 @@ export default function SignInPage() {
       description="Sign in to your account to continue"
       submitText="Sign in"
       onSubmit={handleEmailSignIn}
+      footerText="Don't have an account?"
+      footerLinkText="Sign up"
+      footerLinkHref="/signup"
     />
   );
 }

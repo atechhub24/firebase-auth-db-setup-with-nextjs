@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Sign In",
-  description: "Sign in to your account to manage your operations.",
+  title: "Sign Up",
+  description: "Create a new account to get started.",
 };
 
-export default function SignInLayout({
+export default function SignUpLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
