@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { BorderTrail } from "@/components/ui/border-trail";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -85,7 +86,16 @@ export function AuthForm({
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="relative w-full max-w-md overflow-hidden">
+      <BorderTrail
+        className="bg-gradient-to-l from-blue-500 via-purple-500 to-pink-500"
+        size={120}
+        transition={{
+          repeat: Infinity,
+          duration: 8,
+          ease: "linear",
+        }}
+      />
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
