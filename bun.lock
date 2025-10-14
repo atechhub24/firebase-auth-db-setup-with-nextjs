@@ -4,6 +4,7 @@
     "": {
       "name": "firebase-auth-db-setup-with-nextjs",
       "dependencies": {
+        "@ashirbad/js-core": "^1.0.6",
         "@atechhub/firebase": "^0.0.5",
         "@hookform/resolvers": "^5.2.2",
         "@radix-ui/react-accordion": "^1.2.12",
@@ -68,6 +69,8 @@
   },
   "packages": {
     "@alloc/quick-lru": ["@alloc/quick-lru@5.2.0", "", {}, "sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw=="],
+
+    "@ashirbad/js-core": ["@ashirbad/js-core@1.0.6", "", {}, "sha512-HXOH61TPaX5kbnKF00ZRGtqUXAcqY+xELRg0lwMm+EEgWFNfENOQ3wuH3X4u6dblgxo+eSmDHcBjJ5y1r/Q3oA=="],
 
     "@atechhub/firebase": ["@atechhub/firebase@0.0.5", "", { "peerDependencies": { "firebase": "^12.2.1" } }, "sha512-MoT/RptS0yz2npXh6laLJf6rUkGgKqWmlZUPAGlJFejM5McvzlPPXwUb4H1r4L9BmzJtDEcCZBAP3VmBPwkQ4g=="],
 
