@@ -13,3 +13,17 @@ export interface User extends BaseEntity {
   password: string;
   role: UserRole;
 }
+
+// Input types for user creation
+export interface UserInput {
+  name: string;
+  email: string;
+  password: string;
+  role: UserRole;
+}
+
+export interface UserUpdateInput {
+  name?: string;
+  email?: string;
+  status?: UserStatus;
+}
