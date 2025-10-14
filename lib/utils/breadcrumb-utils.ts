@@ -28,13 +28,15 @@ export function getSegmentLabel(
     return breadcrumbLabelMap[segment];
   }
 
-  // Check if it's a dynamic ID (UUID pattern or number)
-  if (
+  // Check if it's a dynamic ID (UUID, Firebase UID, or number)
+  const isUUID =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
       segment
-    ) ||
-    /^\d+$/.test(segment)
-  ) {
+    );
+  const isNumber = /^\d+$/.test(segment);
+  const isFirebaseUID = /^[a-zA-Z0-9]{20,}$/.test(segment); // Firebase UIDs are typically 28 chars, alphanumeric
+
+  if (isUUID || isNumber || isFirebaseUID) {
     // Return generic label based on previous segment
     if (previousSegment === "staffs") {
       return "Staff Details";
