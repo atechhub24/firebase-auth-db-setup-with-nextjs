@@ -48,44 +48,49 @@ export function ProfileDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className="relative h-10 w-10 rounded-full hover:bg-muted"
-        >
+        <div className="flex items-center gap-2">
           <Avatar className="h-10 w-10 border-2 border-border">
             <AvatarImage alt={user?.name || "User"} />
             <AvatarFallback className="bg-primary text-primary-foreground">
               {user?.name ? getUserInitials(user.name) : "U"}
             </AvatarFallback>
           </Avatar>
-        </Button>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold truncate">
+              {user?.name || "User"}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">
+              {user?.email || "No email"}{" "}
+              {user?.role && (
+                <Badge
+                  variant="secondary"
+                  className="text-xs capitalize font-normal"
+                >
+                  {user.role}
+                </Badge>
+              )}
+            </p>
+          </div>
+        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-80 p-0" align="end" forceMount>
         {/* Active Account Section */}
         <div className="p-4">
-          <div className="flex items-start gap-3">
-            <Avatar className="h-12 w-12 border-2 border-border">
-              <AvatarImage alt={user?.name || "User"} />
-              <AvatarFallback className="bg-primary text-primary-foreground text-base">
-                {user?.name ? getUserInitials(user.name) : "U"}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold truncate">
-                {user?.name || "User"}
-              </p>
-              <p className="text-xs text-muted-foreground truncate">
-                {user?.email || "No email"}{" "}
-                {user?.role && (
-                  <Badge
-                    variant="secondary"
-                    className="mt-2 text-xs capitalize font-normal"
-                  >
-                    {user.role}
-                  </Badge>
-                )}
-              </p>
-            </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold truncate">
+              {user?.name || "User"}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">
+              {user?.email || "No email"}{" "}
+              {user?.role && (
+                <Badge
+                  variant="secondary"
+                  className="text-xs capitalize font-normal"
+                >
+                  {user.role}
+                </Badge>
+              )}
+            </p>
           </div>
 
           {/* Account Actions */}
