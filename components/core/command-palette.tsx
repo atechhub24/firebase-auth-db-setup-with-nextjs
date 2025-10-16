@@ -71,9 +71,11 @@ export function CommandPalette({
           ) : (
             <span className="text-xs">Ctrl</span>
           )}
-          K
+          + K
         </kbd>
-        <span className="hidden lg:inline">to search</span>
+        <span className="hidden lg:inline">
+          to search and navigate different pages
+        </span>
       </p>
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput placeholder="Type a command or search..." />
