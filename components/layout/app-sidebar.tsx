@@ -14,48 +14,19 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import type { UserRole } from "@/lib/types/user.type";
-import { BarChart3, Home, LogOut, Settings, Users2Icon } from "lucide-react";
+import { BarChart3, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
+import { useMenuItems } from "@/hooks/use-menu-items";
 
 const today = new Date().toLocaleDateString();
-
-type NavigationItem = {
-  title: string;
-  url: string;
-  icon: React.ElementType;
-  roles: UserRole[];
-};
-
-// Navigation items
-const navigationItems: NavigationItem[] = [
-  {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: Home,
-    roles: ["admin", "staff"],
-  },
-  {
-    title: "Staffs",
-    url: "/staffs",
-    icon: Users2Icon,
-    roles: ["admin"],
-  },
-];
-
-const settingsItems = [
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
-  },
-];
 
 export function AppSidebar() {
   const pathname = usePathname();
   const params = useParams();
   const router = useRouter();
   const role = params.role as UserRole;
+  const { navigationItems, settingsItems } = useMenuItems();
 
   const handleLogout = async () => {
     try {
