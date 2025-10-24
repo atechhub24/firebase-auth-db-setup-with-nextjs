@@ -1,5 +1,5 @@
+import { Home, Settings, Users2Icon } from "lucide-react";
 import type { UserRole } from "@/lib/types/user.type";
-import { BarChart3, Home, Settings, Users2Icon } from "lucide-react";
 
 export type NavigationItem = {
   title: string;
