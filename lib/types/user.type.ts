@@ -13,6 +13,7 @@ export interface User extends BaseEntity {
   password: string;
   role: UserRole;
   profilePicture?: string;
+  profilePictureFileKey?: string;
 }
 
 // Input types for user creation
@@ -28,4 +29,5 @@ export interface UserUpdateInput {
   email?: string;
   status?: UserStatus;
   profilePicture?: string;
+  profilePictureFileKey?: string;
 }

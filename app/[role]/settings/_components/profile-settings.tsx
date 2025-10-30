@@ -42,6 +42,7 @@ import { z } from "zod";
 const profileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   profilePicture: z.string().url().optional().or(z.literal("")),
+  profilePictureFileKey: z.string().optional(),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
@@ -51,6 +52,7 @@ export function ProfileSettings() {
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [previousFileKey, setPreviousFileKey] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<ProfileFormData>({
@@ -58,16 +60,42 @@ export function ProfileSettings() {
     defaultValues: {
       name: user?.name || "",
       profilePicture: user?.profilePicture || "",
+      profilePictureFileKey: user?.profilePictureFileKey || "",
     },
   });
 
+  // Helper function to delete old image from UploadThing via API using fileKey
+  const deleteOldImage = async (fileKey: string | null | undefined) => {
+    if (!fileKey) return;
+
+    try {
+      const response = await fetch(
+        `/api/uploadthing/delete?fileKey=${encodeURIComponent(fileKey)}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete file");
+      }
+
+      console.log("Deleted old image:", fileKey);
+    } catch (error) {
+      console.error("Error deleting old image:", error);
+      // Don't throw - deletion failure shouldn't block the upload
+    }
+  };
+
   const { startUpload, isUploading } = useUploadThing("imageUploader", {
     onClientUploadComplete: async (res) => {
-      if (res?.[0]?.url && user?.uid) {
+      if (res?.[0]?.url && res?.[0]?.key && user?.uid) {
         const profilePictureUrl = res[0].url;
+        const fileKey = res[0].key;
 
         // Update form value
         form.setValue("profilePicture", profilePictureUrl);
+        form.setValue("profilePictureFileKey", fileKey);
         setImagePreview(profilePictureUrl);
 
         // Auto-save to Firebase
@@ -77,6 +105,7 @@ export function ProfileSettings() {
             path: `users/${user.uid}`,
             data: {
               profilePicture: profilePictureUrl,
+              profilePictureFileKey: fileKey,
               updatedAt: new Date().toISOString(),
               updatedBy: {
                 timestamp: new Date().toISOString(),
@@ -95,8 +124,15 @@ export function ProfileSettings() {
           setUser({
             ...user,
             profilePicture: profilePictureUrl,
+            profilePictureFileKey: fileKey,
             updatedAt: new Date().toISOString(),
           });
+
+          // Delete previous image if it exists
+          if (previousFileKey) {
+            await deleteOldImage(previousFileKey);
+            setPreviousFileKey(null);
+          }
 
           toast.success("Profile picture uploaded and saved!");
         } catch (error) {
@@ -120,7 +156,10 @@ export function ProfileSettings() {
       form.setValue("profilePicture", user.profilePicture);
       setImagePreview(user.profilePicture);
     }
-  }, [user?.name, user?.profilePicture, form]);
+    if (user?.profilePictureFileKey) {
+      form.setValue("profilePictureFileKey", user.profilePictureFileKey);
+    }
+  }, [user?.name, user?.profilePicture, user?.profilePictureFileKey, form]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -138,6 +177,11 @@ export function ProfileSettings() {
       return;
     }
 
+    // Store previous image fileKey before upload (for deletion later)
+    if (user?.profilePictureFileKey) {
+      setPreviousFileKey(user.profilePictureFileKey);
+    }
+
     // Create preview
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -145,19 +189,33 @@ export function ProfileSettings() {
     };
     reader.readAsDataURL(file);
 
-    // Auto-upload immediately
+    // Auto-upload immediately with custom filename
+    if (!user?.uid) {
+      toast.error("User not found");
+      return;
+    }
+
     try {
-      await startUpload([file]);
+      await startUpload([
+        new File([file], `${user.uid}-${Date.now()}-${file.name}`, {
+          type: file.type,
+        }),
+      ]);
     } catch (error) {
       console.error("Error uploading image:", error);
+      // Reset previous fileKey on error
+      setPreviousFileKey(null);
     }
   };
 
   const handleRemoveImage = async () => {
     if (!user?.uid) return;
 
+    const fileKeyToRemove = user.profilePictureFileKey;
+
     setImagePreview(null);
     form.setValue("profilePicture", "");
+    form.setValue("profilePictureFileKey", "");
 
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -170,6 +228,7 @@ export function ProfileSettings() {
         path: `users/${user.uid}`,
         data: {
           profilePicture: null,
+          profilePictureFileKey: null,
           updatedAt: new Date().toISOString(),
           updatedBy: {
             timestamp: new Date().toISOString(),
@@ -188,8 +247,14 @@ export function ProfileSettings() {
       setUser({
         ...user,
         profilePicture: undefined,
+        profilePictureFileKey: undefined,
         updatedAt: new Date().toISOString(),
       });
+
+      // Delete from UploadThing storage using fileKey
+      if (fileKeyToRemove) {
+        await deleteOldImage(fileKeyToRemove);
+      }
 
       toast.success("Profile picture removed");
     } catch (error) {
