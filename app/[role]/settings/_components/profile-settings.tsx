@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ImageEditor } from "@/components/ui/image-editor";
+import { formatFileSize } from "@/lib/utils/image-optimization";
 import { useAppStore } from "@/hooks/use-app-store";
 import { useUploadThing } from "@/lib/utils/uploadthing";
 import { mutate } from "@atechhub/firebase";
@@ -53,6 +55,8 @@ export function ProfileSettings() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [previousFileKey, setPreviousFileKey] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [showImageEditor, setShowImageEditor] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<ProfileFormData>({
@@ -171,9 +175,9 @@ export function ProfileSettings() {
       return;
     }
 
-    // Validate file size (4MB)
-    if (file.size > 4 * 1024 * 1024) {
-      toast.error("Image size must be less than 4MB");
+    // Validate file size (10MB - we'll compress it)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Image size must be less than 10MB");
       return;
     }
 
@@ -182,6 +186,9 @@ export function ProfileSettings() {
       setPreviousFileKey(user.profilePictureFileKey);
     }
 
+    // Set selected file and show editor
+    setSelectedFile(file);
+
     // Create preview
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -189,22 +196,51 @@ export function ProfileSettings() {
     };
     reader.readAsDataURL(file);
 
-    // Auto-upload immediately with custom filename
+    // Open image editor
+    setShowImageEditor(true);
+  };
+
+  const handleEditorSave = async (optimizedFile: File) => {
     if (!user?.uid) {
       toast.error("User not found");
       return;
     }
 
+    setShowImageEditor(false);
+
+    // Show file size info
+    const originalSize = selectedFile
+      ? formatFileSize(selectedFile.size)
+      : "0 KB";
+    const optimizedSize = formatFileSize(optimizedFile.size);
+    const compressionRatio = selectedFile
+      ? ((1 - optimizedFile.size / selectedFile.size) * 100).toFixed(1)
+      : "0";
+
+    toast.success(
+      `Image optimized: ${originalSize} → ${optimizedSize} (${compressionRatio}% reduction)`
+    );
+
+    // Auto-upload optimized file with custom filename
     try {
       await startUpload([
-        new File([file], `${user.uid}-${Date.now()}-${file.name}`, {
-          type: file.type,
+        new File([optimizedFile], `${user.uid}-${Date.now()}-profile.webp`, {
+          type: "image/webp",
         }),
       ]);
     } catch (error) {
       console.error("Error uploading image:", error);
       // Reset previous fileKey on error
       setPreviousFileKey(null);
+    }
+  };
+
+  const handleEditorCancel = () => {
+    setShowImageEditor(false);
+    setSelectedFile(null);
+    setImagePreview(user?.profilePicture || null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -371,7 +407,7 @@ export function ProfileSettings() {
                     <AvatarFallback className="text-lg sm:text-xl">
                       {user?.name
                         ?.split(" ")
-                        .map((n) => n[0])
+                        .map((n: string) => n[0])
                         .join("")
                         .toUpperCase() || "U"}
                     </AvatarFallback>
@@ -421,8 +457,9 @@ export function ProfileSettings() {
                     )}
                   </Button>
                   <p className="text-xs text-muted-foreground">
-                    Select an image to upload (max 4MB). Automatically saves to
-                    your profile.
+                    Select an image to upload (max 10MB). You can crop, rotate,
+                    and optimize before upload. Images are automatically
+                    converted to WEBP format for better compression.
                   </p>
                 </div>
               </div>
@@ -518,6 +555,18 @@ export function ProfileSettings() {
             </div>
           </form>
         </Form>
+
+        {/* Image Editor Dialog */}
+        {selectedFile && (
+          <ImageEditor
+            imageFile={selectedFile}
+            onSave={handleEditorSave}
+            onCancel={handleEditorCancel}
+            open={showImageEditor}
+            aspectRatio={1}
+            circularCrop={true}
+          />
+        )}
       </CardContent>
     </Card>
   );
