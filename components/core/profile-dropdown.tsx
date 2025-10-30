@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useAppStore } from "@/hooks/use-app-store";
-import { LogOut, Settings, User as UserIcon } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 
 export function ProfileDropdown() {
@@ -50,7 +50,10 @@ export function ProfileDropdown() {
       <DropdownMenuTrigger asChild>
         <div className="flex items-center gap-2">
           <Avatar className="h-10 w-10 border-2 border-border">
-            <AvatarImage alt={user?.name || "User"} />
+            <AvatarImage
+              src={user?.profilePicture}
+              alt={user?.name || "User"}
+            />
             <AvatarFallback className="bg-primary text-primary-foreground">
               {user?.name ? getUserInitials(user.name) : "U"}
             </AvatarFallback>
@@ -76,25 +79,36 @@ export function ProfileDropdown() {
       <DropdownMenuContent className="w-80 p-0" align="end" forceMount>
         {/* Active Account Section */}
         <div className="p-4">
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold truncate">
-              {user?.name || "User"}
-            </p>
-            <p className="text-xs text-muted-foreground truncate">
-              {user?.email || "No email"}{" "}
-              {user?.role && (
-                <Badge
-                  variant="secondary"
-                  className="text-xs capitalize font-normal"
-                >
-                  {user.role}
-                </Badge>
-              )}
-            </p>
+          <div className="flex items-center gap-3 mb-4">
+            <Avatar className="h-16 w-16 border-2 border-border">
+              <AvatarImage
+                src={user?.profilePicture}
+                alt={user?.name || "User"}
+              />
+              <AvatarFallback className="bg-primary text-primary-foreground text-lg">
+                {user?.name ? getUserInitials(user.name) : "U"}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold truncate">
+                {user?.name || "User"}
+              </p>
+              <p className="text-xs text-muted-foreground truncate">
+                {user?.email || "No email"}{" "}
+                {user?.role && (
+                  <Badge
+                    variant="secondary"
+                    className="text-xs capitalize font-normal"
+                  >
+                    {user.role}
+                  </Badge>
+                )}
+              </p>
+            </div>
           </div>
 
           {/* Account Actions */}
-          <div className="mt-4 space-y-2">
+          <div className="space-y-2">
             <Button
               variant="outline"
               className="w-full justify-start h-9"

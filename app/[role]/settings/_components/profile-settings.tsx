@@ -50,7 +50,6 @@ export function ProfileSettings() {
   const { user, setUser } = useAppStore();
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -63,15 +62,52 @@ export function ProfileSettings() {
   });
 
   const { startUpload, isUploading } = useUploadThing("imageUploader", {
-    onClientUploadComplete: (res) => {
-      if (res?.[0]?.url) {
-        form.setValue("profilePicture", res[0].url);
-        setImagePreview(res[0].url);
-        toast.success("Profile picture uploaded successfully!");
+    onClientUploadComplete: async (res) => {
+      if (res?.[0]?.url && user?.uid) {
+        const profilePictureUrl = res[0].url;
+
+        // Update form value
+        form.setValue("profilePicture", profilePictureUrl);
+        setImagePreview(profilePictureUrl);
+
+        // Auto-save to Firebase
+        try {
+          await mutate({
+            action: "update",
+            path: `users/${user.uid}`,
+            data: {
+              profilePicture: profilePictureUrl,
+              updatedAt: new Date().toISOString(),
+              updatedBy: {
+                timestamp: new Date().toISOString(),
+                actionBy: "user-profile-picture-update",
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                screenResolution: `${screen.width}x${screen.height}`,
+                browser: navigator.userAgent.split(" ")[0],
+              },
+            },
+            actionBy: "user-profile-picture-update",
+          });
+
+          // Update local state
+          setUser({
+            ...user,
+            profilePicture: profilePictureUrl,
+            updatedAt: new Date().toISOString(),
+          });
+
+          toast.success("Profile picture uploaded and saved!");
+        } catch (error) {
+          console.error("Error saving profile picture:", error);
+          toast.error("Uploaded but failed to save. Please try again.");
+        }
       }
     },
     onUploadError: (error: Error) => {
       toast.error(`Upload failed: ${error.message}`);
+      setImagePreview(user?.profilePicture || null);
     },
   });
 
@@ -86,7 +122,7 @@ export function ProfileSettings() {
     }
   }, [user?.name, user?.profilePicture, form]);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -102,32 +138,63 @@ export function ProfileSettings() {
       return;
     }
 
-    setSelectedFile(file);
     // Create preview
     const reader = new FileReader();
     reader.onloadend = () => {
       setImagePreview(reader.result as string);
     };
     reader.readAsDataURL(file);
-  };
 
-  const handleRemoveImage = () => {
-    setSelectedFile(null);
-    setImagePreview(user?.profilePicture || null);
-    form.setValue("profilePicture", user?.profilePicture || "");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+    // Auto-upload immediately
+    try {
+      await startUpload([file]);
+    } catch (error) {
+      console.error("Error uploading image:", error);
     }
   };
 
-  const handleImageUpload = async () => {
-    if (!selectedFile) return;
+  const handleRemoveImage = async () => {
+    if (!user?.uid) return;
 
+    setImagePreview(null);
+    form.setValue("profilePicture", "");
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
+    // Remove from Firebase
     try {
-      await startUpload([selectedFile]);
-      setSelectedFile(null);
+      await mutate({
+        action: "update",
+        path: `users/${user.uid}`,
+        data: {
+          profilePicture: null,
+          updatedAt: new Date().toISOString(),
+          updatedBy: {
+            timestamp: new Date().toISOString(),
+            actionBy: "user-profile-picture-remove",
+            userAgent: navigator.userAgent,
+            platform: navigator.platform,
+            language: navigator.language,
+            screenResolution: `${screen.width}x${screen.height}`,
+            browser: navigator.userAgent.split(" ")[0],
+          },
+        },
+        actionBy: "user-profile-picture-remove",
+      });
+
+      // Update local state
+      setUser({
+        ...user,
+        profilePicture: undefined,
+        updatedAt: new Date().toISOString(),
+      });
+
+      toast.success("Profile picture removed");
     } catch (error) {
-      console.error("Error uploading image:", error);
+      console.error("Error removing profile picture:", error);
+      toast.error("Failed to remove profile picture");
     }
   };
 
@@ -139,21 +206,11 @@ export function ProfileSettings() {
 
     setIsLoading(true);
     try {
-      // Upload cover image if a new file is selected
-      let profilePictureUrl = data.profilePicture;
-      if (selectedFile) {
-        const uploadResult = await startUpload([selectedFile]);
-        if (uploadResult?.[0]?.url) {
-          profilePictureUrl = uploadResult[0].url;
-        }
-      }
-
       await mutate({
         action: "update",
         path: `users/${user.uid}`,
         data: {
           name: data.name,
-          profilePicture: profilePictureUrl || undefined,
           updatedAt: new Date().toISOString(),
           updatedBy: {
             timestamp: new Date().toISOString(),
@@ -172,15 +229,8 @@ export function ProfileSettings() {
       setUser({
         ...user,
         name: data.name,
-        profilePicture: profilePictureUrl,
         updatedAt: new Date().toISOString(),
       });
-
-      // Reset file selection
-      setSelectedFile(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
 
       // Show success alert with transition
       setShowSuccess(true);
@@ -275,50 +325,39 @@ export function ProfileSettings() {
                   )}
                 </div>
                 <div className="flex-1 space-y-2 w-full sm:w-auto">
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileSelect}
-                      disabled={isLoading || isUploading}
-                      className="hidden"
-                      id="profile-picture-input"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isLoading || isUploading}
-                      className="w-full sm:w-auto"
-                    >
-                      {isUploading ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Uploading...
-                        </>
-                      ) : (
-                        <>
-                          <ImageIcon className="mr-2 h-4 w-4" />
-                          {imagePreview || user?.profilePicture
-                            ? "Change Picture"
-                            : "Upload Picture"}
-                        </>
-                      )}
-                    </Button>
-                    {selectedFile && !isUploading && (
-                      <Button
-                        type="button"
-                        onClick={handleImageUpload}
-                        disabled={isLoading}
-                        className="w-full sm:w-auto"
-                      >
-                        Upload Selected
-                      </Button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    disabled={isLoading || isUploading}
+                    className="hidden"
+                    id="profile-picture-input"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isLoading || isUploading}
+                    className="w-full sm:w-auto"
+                  >
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <ImageIcon className="mr-2 h-4 w-4" />
+                        {imagePreview || user?.profilePicture
+                          ? "Change Picture"
+                          : "Upload Picture"}
+                      </>
                     )}
-                  </div>
+                  </Button>
                   <p className="text-xs text-muted-foreground">
-                    Upload a profile picture (max 4MB). JPG, PNG, or GIF.
+                    Select an image to upload (max 4MB). Automatically saves to
+                    your profile.
                   </p>
                 </div>
               </div>
