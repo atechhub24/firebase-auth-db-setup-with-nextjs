@@ -25,6 +25,8 @@ const envSchema = z.object({
   NEXT_PUBLIC_FIREBASE_AUTH_URL: z
     .string()
     .url("Firebase Auth URL must be a valid URL"),
+  // UploadThing Configuration
+  UPLOADTHING_TOKEN: z.string().min(1, "UploadThing token is required"),
 });
 
 // Validate and parse environment variables
@@ -44,6 +46,7 @@ function validateEnv() {
         process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
       NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
       NEXT_PUBLIC_FIREBASE_AUTH_URL: process.env.NEXT_PUBLIC_FIREBASE_AUTH_URL,
+      UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
