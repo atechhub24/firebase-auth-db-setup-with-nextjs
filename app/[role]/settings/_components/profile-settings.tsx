@@ -132,11 +132,8 @@ export function ProfileSettings() {
             updatedAt: new Date().toISOString(),
           });
 
-          // Delete previous image if it exists
-          if (previousFileKey) {
-            await deleteOldImage(previousFileKey);
-            setPreviousFileKey(null);
-          }
+          // Clear previous fileKey tracking (old file was already deleted before upload)
+          setPreviousFileKey(null);
 
           toast.success("Profile picture uploaded and saved!");
         } catch (error) {
@@ -148,6 +145,8 @@ export function ProfileSettings() {
     onUploadError: (error: Error) => {
       toast.error(`Upload failed: ${error.message}`);
       setImagePreview(user?.profilePicture || null);
+      // Reset previous fileKey on error
+      setPreviousFileKey(null);
     },
   });
 
@@ -220,6 +219,19 @@ export function ProfileSettings() {
     toast.success(
       `Image optimized: ${originalSize} → ${optimizedSize} (${compressionRatio}% reduction)`
     );
+
+    // Delete old file BEFORE uploading new one (if fileKey exists)
+    // Note: UploadThing doesn't support overwriting files - each upload creates a new fileKey
+    // By deleting first, we ensure only one profile picture file exists per user
+    if (previousFileKey) {
+      try {
+        await deleteOldImage(previousFileKey);
+        console.log("Deleted old file before upload:", previousFileKey);
+      } catch (error) {
+        console.error("Error deleting old file:", error);
+        // Continue with upload even if deletion fails
+      }
+    }
 
     // Auto-upload optimized file with custom filename
     try {
