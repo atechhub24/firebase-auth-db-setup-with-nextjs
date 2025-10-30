@@ -20,7 +20,7 @@ class StaffService {
 
     // Step 2: Create staff record in users database
     const userId = await mutate({
-      action: "createWithId",
+      action: "create",
       path: `users/${authResponse.localId}`,
       data: {
         uid: authResponse.localId,
