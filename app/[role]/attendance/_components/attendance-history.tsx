@@ -1,14 +1,14 @@
 "use client";
 
-import { Loader2, MapPin, Clock, Calendar, CheckCircle2, XCircle } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAppStore } from "@/hooks/use-app-store";
 import { attendanceService } from "@/lib/services";
+import { AttendanceCard, cardVariants } from "./attendance-card";
 import type { Attendance } from "@/lib/types/attendance.type";
-import { formatDate, formatTime } from "@/lib/utils/date";
 
 // Animation variants
 const containerVariants = {
@@ -18,18 +18,6 @@ const containerVariants = {
     transition: {
       staggerChildren: 0.05,
       delayChildren: 0.1,
-    },
-  },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.4,
-      ease: [0.22, 1, 0.36, 1],
     },
   },
 };
@@ -97,97 +85,11 @@ export function AttendanceHistory() {
           animate="visible"
           className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {records.map((record, index) => (
-            <motion.div
-              key={record.id}
-              variants={cardVariants}
-              whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="group relative overflow-hidden rounded-lg border bg-card p-4 shadow-sm transition-shadow hover:shadow-md"
-            >
-              {/* Status indicator bar */}
-              <div
-                className={`absolute left-0 top-0 h-full w-1 ${
-                  record.status === "present"
-                    ? "bg-green-500"
-                    : "bg-red-500"
-                }`}
-              />
-
-              <div className="ml-3 space-y-3">
-                {/* Header */}
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="size-4 text-muted-foreground" />
-                      <span className="font-semibold text-sm">
-                        {formatDate(record.punchInTime, "PP")}
-                      </span>
-                    </div>
-                    <div
-                      className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${
-                        record.status === "present"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                          : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                      }`}
-                    >
-                      {record.status === "present" ? (
-                        <CheckCircle2 className="size-3" />
-                      ) : (
-                        <XCircle className="size-3" />
-                      )}
-                      <span className="capitalize">{record.status}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Time information */}
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Clock className="size-4 text-muted-foreground shrink-0" />
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-medium">
-                        In: {formatTime(record.punchInTime)}
-                      </span>
-                      {record.punchOutTime && (
-                        <>
-                          <span className="text-muted-foreground">•</span>
-                          <span className="font-medium">
-                            Out: {formatTime(record.punchOutTime)}
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  {record.totalHours && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <div className="flex items-center gap-1.5 rounded-md bg-muted px-2 py-1">
-                        <span className="font-semibold text-green-600 dark:text-green-400">
-                          {record.totalHours}h
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          worked
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Location */}
-                {record.punchInLocation && (
-                  <div className="flex items-start gap-2 text-xs text-muted-foreground">
-                    <MapPin className="size-3.5 mt-0.5 shrink-0" />
-                    <span className="line-clamp-2 leading-relaxed">
-                      {record.punchInLocation.address}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </motion.div>
+          {records.map((record) => (
+            <AttendanceCard key={record.id} record={record} />
           ))}
         </motion.div>
       </CardContent>
     </Card>
   );
 }
-
