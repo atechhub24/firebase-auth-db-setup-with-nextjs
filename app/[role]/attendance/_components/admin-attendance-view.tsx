@@ -1,23 +1,25 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
-import { useQueryState, parseAsString, useQueryStates } from "nuqs";
+import { format, isValid, parse } from "date-fns";
+import { BarChart3, List, MapPin } from "lucide-react";
 import { motion } from "motion/react";
-import { MapPin, List } from "lucide-react";
-import { format, parse, isValid } from "date-fns";
-import { AdminAttendanceAnalytics } from "./admin-attendance-analytics";
-import { AdminAttendance } from "./admin-attendance";
-import { AdminAttendanceMap } from "./admin-attendance-map";
-import { AttendanceFilters } from "./attendance-filters";
-import { AttendanceActions } from "./attendance-actions";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { parseAsString, useQueryState, useQueryStates } from "nuqs";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { staffService } from "@/lib/services";
 import type { User } from "@/lib/types/user.type";
-import { toast } from "sonner";
+import { AdminAttendance } from "./admin-attendance";
+import { AdminAttendanceAnalytics } from "./admin-attendance-analytics";
+import { AdminAttendanceCharts } from "./admin-attendance-charts";
+import { AdminAttendanceMap } from "./admin-attendance-map";
+import { AttendanceActions } from "./attendance-actions";
+import { AttendanceFilters } from "./attendance-filters";
 
 const tabs = [
   { id: "map", label: "Map", icon: MapPin },
   { id: "list", label: "List", icon: List },
+  { id: "charts", label: "Charts", icon: BarChart3 },
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -84,6 +86,7 @@ export function AdminAttendanceView() {
   const analyticsRef = useRef<{ refetch: () => void }>(null);
   const mapRef = useRef<{ refetch: () => void }>(null);
   const listRef = useRef<{ refetch: () => void }>(null);
+  const chartsRef = useRef<{ refetch: () => void }>(null);
 
   const handleResetFilters = () => {
     // Clear all filter query params (keeps tab)
@@ -105,6 +108,9 @@ export function AdminAttendanceView() {
       case "list":
         listRef.current?.refetch();
         break;
+      case "charts":
+        chartsRef.current?.refetch();
+        break;
     }
     setRefetchKey((prev) => prev + 1);
   };
@@ -122,7 +128,7 @@ export function AdminAttendanceView() {
         className="w-full"
       >
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-4">
-          <TabsList className="grid w-full lg:w-auto grid-cols-2 flex-shrink-0">
+          <TabsList className="grid w-full lg:w-auto grid-cols-3 flex-shrink-0">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
@@ -182,8 +188,24 @@ export function AdminAttendanceView() {
             />
           </motion.div>
         </TabsContent>
+
+        <TabsContent value="charts" className="mt-0">
+          <motion.div
+            key={`charts-${activeTab}`}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+          >
+            <AdminAttendanceCharts
+              ref={chartsRef}
+              key={`charts-${refetchKey}`}
+              selectedStaffId={selectedStaffId || "all"}
+              dateStr={dateStr || format(new Date(), "yyyy-MM-dd")}
+            />
+          </motion.div>
+        </TabsContent>
       </Tabs>
     </div>
   );
 }
-
