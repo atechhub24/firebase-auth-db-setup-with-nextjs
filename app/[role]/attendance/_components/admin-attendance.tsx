@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Loader2 } from "lucide-react";
+import { useQueryState, parseAsString } from "nuqs";
 import { motion } from "motion/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { attendanceService, staffService } from "@/lib/services";
@@ -26,8 +27,13 @@ const containerVariants = {
 export function AdminAttendance() {
   const [records, setRecords] = useState<Attendance[]>([]);
   const [staffs, setStaffs] = useState<UserType[]>([]);
-  const [selectedStaffId, setSelectedStaffId] = useState<string>("all");
   const [loading, setLoading] = useState(true);
+
+  // URL state management
+  const [selectedStaffId, setSelectedStaffId] = useQueryState(
+    "staff",
+    parseAsString.withDefault("all")
+  );
 
   const loadStaffs = useCallback(async () => {
     try {

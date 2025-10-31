@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { CalendarIcon, Loader2, MapPin, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,38 +11,57 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { useQueryState, parseAsString } from "nuqs";
 import { attendanceService, staffService } from "@/lib/services";
 import { StaffSelector } from "./staff-selector";
 import { formatTime } from "@/lib/utils/date";
 import type { Attendance } from "@/lib/types/attendance.type";
 import type { User } from "@/lib/types/user.type";
-import { format } from "date-fns";
+import { format, parse, isValid } from "date-fns";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 const AttendanceMapClient = dynamic(
-  () => import("./attendance-map-client").then((mod) => ({ default: mod.AttendanceMapClient })),
+  () =>
+    import("./attendance-map-client").then((mod) => ({
+      default: mod.AttendanceMapClient,
+    })),
   { ssr: false }
 );
 
 export function AdminAttendanceMap() {
   const [records, setRecords] = useState<Attendance[]>([]);
   const [staffs, setStaffs] = useState<User[]>([]);
-  const [selectedStaffId, setSelectedStaffId] = useState<string>("all");
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [loading, setLoading] = useState(true);
   const [calendarOpen, setCalendarOpen] = useState(false);
 
-  useEffect(() => {
-    loadStaffs();
-    loadRecords();
-  }, []);
+  // URL state management
+  const [selectedStaffId, setSelectedStaffId] = useQueryState(
+    "staff",
+    parseAsString.withDefault("all")
+  );
+  const [dateStr, setDateStr] = useQueryState(
+    "date",
+    parseAsString.withDefault(format(new Date(), "yyyy-MM-dd"))
+  );
 
-  useEffect(() => {
-    loadRecords();
-  }, [selectedStaffId, selectedDate]);
+  // Convert date string to Date object
+  const selectedDate = dateStr
+    ? (() => {
+        const parsed = parse(dateStr, "yyyy-MM-dd", new Date());
+        return isValid(parsed) ? parsed : new Date();
+      })()
+    : new Date();
 
-  const loadStaffs = async () => {
+  // Update date string when date changes (from calendar)
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      setDateStr(format(date, "yyyy-MM-dd"));
+      setCalendarOpen(false);
+    }
+  };
+
+  const loadStaffs = useCallback(async () => {
     try {
       const data = await staffService.getAll();
       setStaffs(data);
@@ -50,21 +69,22 @@ export function AdminAttendanceMap() {
       console.error("Failed to load staffs:", error);
       toast.error("Failed to load staffs");
     }
-  };
+  }, []);
 
-  const loadRecords = async () => {
+  const loadRecords = useCallback(async () => {
+    if (!dateStr) return;
+
     try {
       setLoading(true);
-      const dateStr = format(selectedDate, "yyyy-MM-dd");
       let data: Attendance[];
-      
+
       if (selectedStaffId === "all") {
         data = await attendanceService.getByDate(dateStr);
       } else {
         const allData = await attendanceService.getByStaffId(selectedStaffId);
         data = allData.filter((record) => record.date === dateStr);
       }
-      
+
       setRecords(data);
     } catch (error) {
       console.error("Failed to load attendance records:", error);
@@ -72,7 +92,15 @@ export function AdminAttendanceMap() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedStaffId, dateStr]);
+
+  useEffect(() => {
+    loadStaffs();
+  }, [loadStaffs]);
+
+  useEffect(() => {
+    loadRecords();
+  }, [loadRecords]);
 
   const dateWithRecords = new Set(records.map((r) => r.date));
 
@@ -112,12 +140,7 @@ export function AdminAttendanceMap() {
                 <CalendarComponent
                   mode="single"
                   selected={selectedDate}
-                  onSelect={(date) => {
-                    if (date) {
-                      setSelectedDate(date);
-                      setCalendarOpen(false);
-                    }
-                  }}
+                  onSelect={handleDateSelect}
                   modifiers={{
                     hasRecords: (date) =>
                       dateWithRecords.has(format(date, "yyyy-MM-dd")),
@@ -160,7 +183,7 @@ export function AdminAttendanceMap() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <h3 className="font-semibold text-sm">
                   {format(selectedDate, "PP")} - Records ({records.length})

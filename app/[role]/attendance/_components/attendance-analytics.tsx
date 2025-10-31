@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useQueryState, parseAsString } from "nuqs";
 import { Clock, Calendar, TrendingUp, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -12,27 +13,33 @@ import {
 } from "@/components/ui/select";
 import { useAppStore } from "@/hooks/use-app-store";
 import { attendanceService } from "@/lib/services";
-import type { AttendanceAnalytics } from "@/lib/types/attendance.type";
+import type { AttendanceAnalytics as AttendanceAnalyticsType } from "@/lib/types/attendance.type";
 import { toast } from "sonner";
 
 export function AttendanceAnalytics() {
   const user = useAppStore((state) => state.user);
-  const [analytics, setAnalytics] = useState<AttendanceAnalytics | null>(null);
-  const [period, setPeriod] = useState<"week" | "month">("week");
+  const [analytics, setAnalytics] = useState<AttendanceAnalyticsType | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (user?.uid) {
-      loadAnalytics();
-    }
-  }, [user?.uid, period]);
+  // URL state management
+  const [period, setPeriod] = useQueryState(
+    "analyticsPeriod",
+    parseAsString.withDefault("week").withOptions({
+      clearOnDefault: true,
+    })
+  );
 
-  const loadAnalytics = async () => {
+  const loadAnalytics = useCallback(async () => {
     if (!user?.uid) return;
 
     try {
       setLoading(true);
-      const data = await attendanceService.getStaffAnalytics(user.uid, period);
+      const data = await attendanceService.getStaffAnalytics(
+        user.uid,
+        (period as "week" | "month") || "week"
+      );
       setAnalytics(data);
     } catch (error) {
       console.error("Failed to load analytics:", error);
@@ -40,7 +47,13 @@ export function AttendanceAnalytics() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.uid, period]);
+
+  useEffect(() => {
+    if (user?.uid) {
+      loadAnalytics();
+    }
+  }, [user?.uid, loadAnalytics]);
 
   if (loading) {
     return (
@@ -64,7 +77,10 @@ export function AttendanceAnalytics() {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Analytics</CardTitle>
-          <Select value={period} onValueChange={(v) => setPeriod(v as "week" | "month")}>
+          <Select
+            value={period || "week"}
+            onValueChange={(v) => setPeriod(v as "week" | "month")}
+          >
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>
@@ -112,4 +128,3 @@ export function AttendanceAnalytics() {
     </Card>
   );
 }
-

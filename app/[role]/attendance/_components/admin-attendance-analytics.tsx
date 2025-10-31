@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useQueryState, parseAsString } from "nuqs";
 import { Users, Clock, TrendingUp, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -16,17 +17,22 @@ import { toast } from "sonner";
 
 export function AdminAttendanceAnalytics() {
   const [analytics, setAnalytics] = useState<AdminAnalytics | null>(null);
-  const [period, setPeriod] = useState<"week" | "month">("week");
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadAnalytics();
-  }, [period]);
+  // URL state management
+  const [period, setPeriod] = useQueryState(
+    "analyticsPeriod",
+    parseAsString.withDefault("week").withOptions({
+      clearOnDefault: true,
+    })
+  );
 
-  const loadAnalytics = async () => {
+  const loadAnalytics = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await attendanceService.getAdminAnalytics(period);
+      const data = await attendanceService.getAdminAnalytics(
+        (period as "week" | "month") || "week"
+      );
       setAnalytics(data);
     } catch (error) {
       console.error("Failed to load analytics:", error);
@@ -34,7 +40,11 @@ export function AdminAttendanceAnalytics() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [period]);
+
+  useEffect(() => {
+    loadAnalytics();
+  }, [loadAnalytics]);
 
   if (loading) {
     return (
@@ -58,7 +68,10 @@ export function AdminAttendanceAnalytics() {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Organization Analytics</CardTitle>
-          <Select value={period} onValueChange={(v) => setPeriod(v as "week" | "month")}>
+          <Select
+            value={period || "week"}
+            onValueChange={(v) => setPeriod(v as "week" | "month")}
+          >
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>
@@ -117,4 +130,3 @@ export function AdminAttendanceAnalytics() {
     </Card>
   );
 }
-
