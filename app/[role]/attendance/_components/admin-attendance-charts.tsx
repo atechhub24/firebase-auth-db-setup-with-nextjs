@@ -242,20 +242,12 @@ export const AdminAttendanceCharts = forwardRef<
                     }
                   }}
                 />
+                <ChartLegend
+                  content={<ChartLegendContent nameKey="status" />}
+                  className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
+                />
               </PieChart>
             </ChartContainer>
-            <ChartLegend
-              content={
-                <ChartLegendContent
-                  nameKey="status"
-                  payload={chartData.statusData.map((item) => ({
-                    value: item.status,
-                    color: item.fill,
-                    type: "square",
-                  }))}
-                />
-              }
-            />
           </CardContent>
         </Card>
 
