@@ -36,6 +36,7 @@ class BlogService {
       content: data.content,
       excerpt: data.excerpt,
       coverImage: data.coverImage,
+      coverImageFileKey: data.coverImageFileKey,
       author: data.author,
       category: data.category,
       tags: data.tags || [],
@@ -162,6 +163,7 @@ class BlogService {
     if (data.content !== undefined) updateData.content = data.content;
     if (data.excerpt !== undefined) updateData.excerpt = data.excerpt;
     if (data.coverImage !== undefined) updateData.coverImage = data.coverImage;
+    if (data.coverImageFileKey !== undefined) updateData.coverImageFileKey = data.coverImageFileKey;
     if (data.author !== undefined) updateData.author = data.author;
     if (data.category !== undefined) updateData.category = data.category;
     if (data.tags !== undefined) updateData.tags = data.tags;

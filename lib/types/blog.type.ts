@@ -16,6 +16,7 @@ export interface Blog extends BaseEntity {
   content: Record<string, unknown>; // TipTap JSON content
   excerpt: string;
   coverImage?: string; // URL from UploadThing
+  coverImageFileKey?: string; // File key from UploadThing for deletion
   author: string; // User ID or author name
   category: BlogCategory;
   tags?: string[];
@@ -30,6 +31,7 @@ export interface BlogInput {
   content: Record<string, unknown>;
   excerpt: string;
   coverImage?: string;
+  coverImageFileKey?: string;
   author: string;
   category: BlogCategory;
   tags?: string[];
@@ -44,6 +46,7 @@ export interface BlogUpdateInput {
   content?: Record<string, unknown>;
   excerpt?: string;
   coverImage?: string;
+  coverImageFileKey?: string;
   author?: string;
   category?: BlogCategory;
   tags?: string[];
@@ -51,4 +54,3 @@ export interface BlogUpdateInput {
   status?: BlogStatus;
   featured?: boolean;
 }
-

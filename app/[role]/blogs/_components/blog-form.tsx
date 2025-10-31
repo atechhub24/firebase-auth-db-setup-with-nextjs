@@ -38,11 +38,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Switch } from "@/components/ui/switch";
 import { ImageEditor } from "@/components/ui/image-editor";
+import { formatFileSize } from "@/lib/utils/image-optimization";
 import { useUploadThing } from "@/lib/utils/uploadthing";
 import { blogService } from "@/lib/services/blog.service";
 import { generateSlug } from "@/lib/utils/blog-utils";
 import type { Blog, BlogCategory, BlogStatus } from "@/lib/types/blog.type";
 import { useAppStore } from "@/hooks/use-app-store";
+import { mutate } from "@atechhub/firebase";
 
 const blogSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -53,7 +55,8 @@ const blogSchema = z.object({
     .refine((val) => val && typeof val === "object" && "type" in val, {
       message: "Content is required",
     }),
-  coverImage: z.string().optional(),
+  coverImage: z.string().url().optional().or(z.literal("")),
+  coverImageFileKey: z.string().optional(),
   author: z.string().min(1, "Author is required"),
   category: z.enum([
     "health",
@@ -96,17 +99,56 @@ export function BlogForm({ blog }: BlogFormProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showImageEditor, setShowImageEditor] = useState(false);
   const [tagInput, setTagInput] = useState("");
+  const [previousFileKey, setPreviousFileKey] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const { startUpload, isUploading } = useUploadThing("imageUploader", {
-    onClientUploadComplete: (res) => {
-      if (res?.[0]?.url) {
-        form.setValue("coverImage", res[0].url);
-        toast.success("Cover image uploaded!");
+    onClientUploadComplete: async (res) => {
+      if (res?.[0]?.url && res?.[0]?.key) {
+        const coverImageUrl = res[0].url;
+        const fileKey = res[0].key;
+
+        // Update form value
+        form.setValue("coverImage", coverImageUrl);
+        form.setValue("coverImageFileKey", fileKey);
+        setImagePreview(coverImageUrl);
         setSelectedFile(null);
+
+        // Auto-save to Firebase if blog exists
+        if (blog?.id) {
+          try {
+            await mutate({
+              action: "update",
+              path: `blogs/${blog.id}`,
+              data: {
+                coverImage: coverImageUrl,
+                coverImageFileKey: fileKey,
+                updatedAt: new Date().toISOString(),
+              },
+              actionBy: "admin",
+            });
+
+            // Clear previous fileKey tracking (old file was already deleted before upload)
+            setPreviousFileKey(null);
+
+            toast.success("Cover image uploaded and saved!");
+          } catch (error) {
+            console.error("Error saving cover image:", error);
+            toast.error("Uploaded but failed to save. Please try again.");
+          }
+        } else {
+          // For new blogs, just show success - will be saved on form submit
+          setPreviousFileKey(null);
+          toast.success("Cover image uploaded!");
+        }
       }
     },
     onUploadError: (error: Error) => {
       toast.error(`Upload failed: ${error.message}`);
+      // Reset to previous preview on error
+      setImagePreview(blog?.coverImage || form.getValues("coverImage") || null);
+      // Reset previous fileKey on error
+      setPreviousFileKey(null);
     },
   });
 
@@ -118,6 +160,7 @@ export function BlogForm({ blog }: BlogFormProps) {
       excerpt: blog?.excerpt || "",
       content: blog?.content || { type: "doc", content: [] },
       coverImage: blog?.coverImage || "",
+      coverImageFileKey: blog?.coverImageFileKey || "",
       author: blog?.author || user?.name || "",
       category: (blog?.category || "general") as BlogCategory,
       tags: blog?.tags || [],
@@ -129,6 +172,49 @@ export function BlogForm({ blog }: BlogFormProps) {
   const watchedSlug = form.watch("slug");
   const watchedTags = form.watch("tags") || [];
 
+  // Update form values when blog data becomes available
+  useEffect(() => {
+    if (blog) {
+      if (blog.title) form.setValue("title", blog.title);
+      if (blog.slug) form.setValue("slug", blog.slug);
+      if (blog.excerpt) form.setValue("excerpt", blog.excerpt);
+      if (blog.content) form.setValue("content", blog.content);
+      if (blog.coverImage) {
+        form.setValue("coverImage", blog.coverImage);
+        setImagePreview(blog.coverImage);
+      }
+      if (blog.coverImageFileKey) form.setValue("coverImageFileKey", blog.coverImageFileKey);
+      if (blog.author) form.setValue("author", blog.author);
+      if (blog.category) form.setValue("category", blog.category);
+      if (blog.tags) form.setValue("tags", blog.tags);
+      if (blog.status) form.setValue("status", blog.status);
+      if (blog.featured !== undefined) form.setValue("featured", blog.featured);
+    }
+  }, [blog, form]);
+
+  // Helper function to delete old image from UploadThing via API using fileKey
+  const deleteOldImage = async (fileKey: string | null | undefined) => {
+    if (!fileKey) return;
+
+    try {
+      const response = await fetch(
+        `/api/uploadthing/delete?fileKey=${encodeURIComponent(fileKey)}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete file");
+      }
+
+      console.log("Deleted old image:", fileKey);
+    } catch (error) {
+      console.error("Error deleting old image:", error);
+      // Don't throw - deletion failure shouldn't block the upload
+    }
+  };
+
   // Auto-generate slug when title changes
   const handleTitleChange = (value: string) => {
     form.setValue("title", value);
@@ -138,14 +224,88 @@ export function BlogForm({ blog }: BlogFormProps) {
   };
 
   const handleFileSelect = (file: File) => {
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+
+    // Validate file size (10MB - we'll compress it)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Image size must be less than 10MB");
+      return;
+    }
+
+    // Store previous image fileKey before upload (for deletion later)
+    // Check both blog prop and form value
+    const currentFileKey = blog?.coverImageFileKey || form.getValues("coverImageFileKey");
+    if (currentFileKey) {
+      setPreviousFileKey(currentFileKey);
+    }
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
     setSelectedFile(file);
     setShowImageEditor(true);
   };
 
   const handleImageEditorSave = async (optimizedFile: File) => {
+    if (!blog?.id && !user?.uid) {
+      toast.error("Blog or user not found");
+      return;
+    }
+
     setShowImageEditor(false);
-    setSelectedFile(optimizedFile);
-    // Don't upload here, wait for form submit
+
+    // Show file size info
+    const originalSize = selectedFile
+      ? formatFileSize(selectedFile.size)
+      : "0 KB";
+    const optimizedSize = formatFileSize(optimizedFile.size);
+    const compressionRatio = selectedFile
+      ? ((1 - optimizedFile.size / selectedFile.size) * 100).toFixed(1)
+      : "0";
+
+    toast.success(
+      `Image optimized: ${originalSize} → ${optimizedSize} (${compressionRatio}% reduction)`
+    );
+
+    // Delete old file BEFORE uploading new one (if fileKey exists)
+    // Note: UploadThing doesn't support overwriting files - each upload creates a new fileKey
+    // By deleting first, we ensure only one cover image file exists per blog
+    if (previousFileKey) {
+      try {
+        await deleteOldImage(previousFileKey);
+        console.log("Deleted old file before upload:", previousFileKey);
+      } catch (error) {
+        console.error("Error deleting old file:", error);
+        // Continue with upload even if deletion fails
+      }
+    }
+
+    // Auto-upload optimized file with custom filename
+    const blogId = blog?.id || "new";
+    const userId = user?.uid || "unknown";
+    try {
+      await startUpload([
+        new File(
+          [optimizedFile],
+          `${blogId}-${userId}-${Date.now()}-cover.webp`,
+          {
+            type: "image/webp",
+          }
+        ),
+      ]);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      // Reset previous fileKey on error
+      setPreviousFileKey(null);
+    }
   };
 
   const handleAddTag = () => {
@@ -162,22 +322,53 @@ export function BlogForm({ blog }: BlogFormProps) {
     );
   };
 
+  const handleRemoveCoverImage = async () => {
+    const fileKeyToRemove = blog?.coverImageFileKey || form.getValues("coverImageFileKey");
+
+    form.setValue("coverImage", "");
+    form.setValue("coverImageFileKey", "");
+    setImagePreview(null);
+    setSelectedFile(null);
+    setPreviousFileKey(null);
+
+    // Remove from Firebase if blog exists
+    if (blog?.id) {
+      try {
+        await mutate({
+          action: "update",
+          path: `blogs/${blog.id}`,
+          data: {
+            coverImage: null,
+            coverImageFileKey: null,
+            updatedAt: new Date().toISOString(),
+          },
+          actionBy: "admin",
+        });
+
+        // Delete from UploadThing storage using fileKey
+        if (fileKeyToRemove) {
+          await deleteOldImage(fileKeyToRemove);
+        }
+
+        toast.success("Cover image removed");
+      } catch (error) {
+        console.error("Error removing cover image:", error);
+        toast.error("Failed to remove cover image");
+      }
+    } else if (fileKeyToRemove) {
+      // For new blogs, just delete the file
+      await deleteOldImage(fileKeyToRemove);
+      toast.success("Cover image removed");
+    }
+  };
+
   const onSubmit = async (data: BlogFormData) => {
     setIsLoading(true);
     try {
-      let coverImageUrl = data.coverImage;
-
-      // Upload cover image if a new file is selected
-      if (selectedFile) {
-        const uploadResult = await startUpload([selectedFile]);
-        if (uploadResult?.[0]?.url) {
-          coverImageUrl = uploadResult[0].url;
-        }
-      }
-
       const blogData = {
         ...data,
-        coverImage: coverImageUrl,
+        coverImage: data.coverImage || undefined,
+        coverImageFileKey: data.coverImageFileKey || undefined,
       };
 
       if (blog) {
@@ -299,10 +490,10 @@ export function BlogForm({ blog }: BlogFormProps) {
                       <FormLabel>Cover Image</FormLabel>
                       <FormControl>
                         <div className="space-y-2">
-                          {field.value && (
+                          {(imagePreview || field.value) && (
                             <div className="relative w-full h-48 rounded-md overflow-hidden border">
                               <img
-                                src={field.value}
+                                src={imagePreview || field.value}
                                 alt="Cover preview"
                                 className="w-full h-full object-cover"
                               />
@@ -311,10 +502,8 @@ export function BlogForm({ blog }: BlogFormProps) {
                                 variant="destructive"
                                 size="icon-sm"
                                 className="absolute top-2 right-2"
-                                onClick={() => {
-                                  form.setValue("coverImage", "");
-                                  setSelectedFile(null);
-                                }}
+                                onClick={handleRemoveCoverImage}
+                                disabled={isLoading || isUploading}
                               >
                                 <X className="h-4 w-4" />
                               </Button>
@@ -331,6 +520,7 @@ export function BlogForm({ blog }: BlogFormProps) {
                                 }
                               }}
                               className="cursor-pointer"
+                              disabled={isLoading || isUploading}
                             />
                             {isUploading && (
                               <p className="text-sm text-muted-foreground self-center">
@@ -338,6 +528,11 @@ export function BlogForm({ blog }: BlogFormProps) {
                               </p>
                             )}
                           </div>
+                          <p className="text-xs text-muted-foreground">
+                            Select an image to upload (max 10MB). You can crop, rotate,
+                            and optimize before upload. Images are automatically
+                            converted to WEBP format for better compression.
+                          </p>
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -592,6 +787,10 @@ export function BlogForm({ blog }: BlogFormProps) {
           onCancel={() => {
             setShowImageEditor(false);
             setSelectedFile(null);
+            // Reset to previous preview on cancel
+            setImagePreview(blog?.coverImage || form.getValues("coverImage") || null);
+            // Reset previous fileKey on cancel
+            setPreviousFileKey(null);
           }}
           aspectRatio={16 / 9}
           circularCrop={false}
