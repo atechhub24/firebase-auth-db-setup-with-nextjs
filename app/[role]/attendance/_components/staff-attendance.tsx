@@ -4,7 +4,7 @@ import { PunchControl } from "./punch-control";
 import { AttendanceStats } from "./attendance-stats";
 import { AttendanceAnalytics } from "./attendance-analytics";
 import { AttendanceMap } from "./attendance-map";
-import { AttendanceHistoryTable } from "./attendance-history-table";
+import { AttendanceHistory } from "./attendance-history";
 
 export function StaffAttendance() {
   return (
@@ -15,8 +15,7 @@ export function StaffAttendance() {
       </div>
       <AttendanceAnalytics />
       <AttendanceMap />
-      <AttendanceHistoryTable />
+      <AttendanceHistory />
     </div>
   );
 }
-
