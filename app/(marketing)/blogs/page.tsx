@@ -9,7 +9,9 @@ import { BlogSortControls } from "./_components/blog-sort-controls";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { useQueryState, parseAsArrayOf, parseAsString } from "nuqs";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
+import { staggerContainer, scaleIn } from "@/lib/utils/motion-variants";
+import { BookOpen } from "lucide-react";
 
 export default function BlogsPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -104,21 +106,23 @@ export default function BlogsPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4 sm:p-6 space-y-6">
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-4 w-96" />
+      <div className="container mx-auto p-4 md:p-6 space-y-8">
+        {/* Header Skeletons */}
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-64 mx-auto" />
+          <Skeleton className="h-6 w-96 mx-auto" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i}>
-              <Skeleton className="h-48 w-full" />
-              <CardContent className="p-4 space-y-2">
-                <Skeleton className="h-6 w-full" />
-                <Skeleton className="h-4 w-3/4" />
-              </CardContent>
-            </Card>
-          ))}
+        {/* Content Skeletons */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <Skeleton className="h-64" />
+          <div className="lg:col-span-3 space-y-4">
+            <Skeleton className="h-10 w-full" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-64" />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -126,68 +130,125 @@ export default function BlogsPage() {
 
   if (error) {
     return (
-      <div className="container mx-auto p-4 sm:p-6">
-        <Card>
-          <CardContent className="p-6">
-            <p className="text-red-600">{error}</p>
-          </CardContent>
-        </Card>
+      <div className="container mx-auto p-6">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="rounded-2xl border-2 border-destructive/50 bg-destructive/10 p-8 text-center"
+        >
+          <h3 className="text-lg font-semibold text-destructive mb-2">Error</h3>
+          <p className="text-muted-foreground">{error}</p>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 space-y-6 max-w-7xl">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-2"
-      >
-        <h1 className="text-3xl font-bold tracking-tight">Blog</h1>
-        <p className="text-muted-foreground">
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={staggerContainer}
+      className="container mx-auto p-4 md:p-6 space-y-8 max-w-7xl"
+    >
+      {/* Hero Header with Animated Glow */}
+      <motion.div variants={scaleIn} className="text-center space-y-4">
+        <div className="relative inline-block">
+          {/* Animated glow background */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-transparent rounded-full blur-2xl"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.5, 0.8, 0.5],
+            }}
+            transition={{ duration: 3, repeat: Infinity }}
+          />
+          {/* Title with gradient text */}
+          <motion.h1
+            className="relative text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-foreground via-foreground/80 to-foreground/60 bg-clip-text text-transparent"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            Blog
+          </motion.h1>
+        </div>
+        {/* Subtitle with fade-in */}
+        <motion.p
+          className="text-muted-foreground text-lg md:text-xl"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
           Discover our latest articles and insights
-        </p>
+        </motion.p>
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Filters Sidebar */}
-        <div className="lg:col-span-1">
+        <motion.div
+          className="lg:col-span-1"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+        >
           <BlogFilters blogs={blogs} />
-        </div>
+        </motion.div>
 
         {/* Blog List */}
-        <div className="lg:col-span-3 space-y-4">
+        <motion.div
+          className="lg:col-span-3 space-y-4"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.25 }}
+        >
           <BlogSortControls />
 
-          {filteredBlogs.length === 0 ? (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <p className="text-muted-foreground">No blogs found</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div
-              className={
-                viewMode === "grid"
-                  ? "grid grid-cols-1 md:grid-cols-2 gap-6"
-                  : "space-y-4"
-              }
-            >
-              {filteredBlogs.map((blog, index) => (
+          <AnimatePresence mode="popLayout">
+            {filteredBlogs.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="relative overflow-hidden rounded-2xl border-2 border-dashed border-border/50 bg-muted/30 p-12 text-center"
+              >
+                {/* Animated Icon */}
                 <motion.div
-                  key={blog.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                  className="inline-block mb-4"
                 >
-                  <BlogCard blog={blog} />
+                  <BookOpen className="h-16 w-16 text-muted-foreground mx-auto" />
                 </motion.div>
-              ))}
-            </div>
-          )}
-        </div>
+                <h3 className="text-xl font-semibold mb-2">No blogs found</h3>
+                <p className="text-muted-foreground">
+                  Try adjusting your search or filter terms.
+                </p>
+              </motion.div>
+            ) : (
+              <motion.div
+                className={
+                  viewMode === "grid"
+                    ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                    : "space-y-6"
+                }
+                layout
+              >
+                {filteredBlogs.map((blog, index) => (
+                  <motion.div
+                    key={blog.id}
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                    transition={{ delay: index * 0.05 }}
+                    layout
+                  >
+                    <BlogCard blog={blog} />
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }
-
