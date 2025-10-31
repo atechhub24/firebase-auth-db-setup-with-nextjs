@@ -3,7 +3,7 @@
 import { useAppStore } from "@/hooks/use-app-store";
 import { StaffAttendance } from "./_components/staff-attendance";
 import { AdminAttendanceAnalytics } from "./_components/admin-attendance-analytics";
-import { AdminAttendanceTable } from "./_components/admin-attendance-table";
+import { AdminAttendance } from "./_components/admin-attendance";
 import { AdminAttendanceMap } from "./_components/admin-attendance-map";
 
 export default function AttendancePage() {
@@ -15,7 +15,7 @@ export default function AttendancePage() {
       <div className="container mx-auto p-4 sm:p-6 space-y-6 max-w-7xl">
         <AdminAttendanceAnalytics />
         <AdminAttendanceMap />
-        <AdminAttendanceTable />
+        <AdminAttendance />
       </div>
     );
   }
@@ -26,4 +26,3 @@ export default function AttendancePage() {
     </div>
   );
 }
-
