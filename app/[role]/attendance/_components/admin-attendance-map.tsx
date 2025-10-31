@@ -8,24 +8,13 @@ import {
   useImperativeHandle,
 } from "react";
 import dynamic from "next/dynamic";
-import { CalendarIcon, Loader2, MapPin, Clock } from "lucide-react";
+import { Loader2, MapPin, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { useQueryState, parseAsString } from "nuqs";
-import { attendanceService, staffService } from "@/lib/services";
-import { StaffSelector } from "./staff-selector";
+import { attendanceService } from "@/lib/services";
 import { formatTime } from "@/lib/utils/date";
 import type { Attendance } from "@/lib/types/attendance.type";
-import type { User } from "@/lib/types/user.type";
 import { format, parse, isValid } from "date-fns";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
 const AttendanceMapClient = dynamic(
   () =>
@@ -39,48 +28,25 @@ export interface AdminAttendanceMapRef {
   refetch: () => void;
 }
 
-export const AdminAttendanceMap = forwardRef<AdminAttendanceMapRef>(
-  (_, ref) => {
-    const [records, setRecords] = useState<Attendance[]>([]);
-    const [staffs, setStaffs] = useState<User[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [calendarOpen, setCalendarOpen] = useState(false);
+interface AdminAttendanceMapProps {
+  selectedStaffId: string;
+  dateStr: string;
+}
 
-    // URL state management
-    const [selectedStaffId, setSelectedStaffId] = useQueryState(
-      "staff",
-      parseAsString.withDefault("all")
-    );
-    const [dateStr, setDateStr] = useQueryState(
-      "date",
-      parseAsString.withDefault(format(new Date(), "yyyy-MM-dd"))
-    );
+export const AdminAttendanceMap = forwardRef<
+  AdminAttendanceMapRef,
+  AdminAttendanceMapProps
+>(({ selectedStaffId, dateStr }, ref) => {
+  const [records, setRecords] = useState<Attendance[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    // Convert date string to Date object
-    const selectedDate = dateStr
-      ? (() => {
-          const parsed = parse(dateStr, "yyyy-MM-dd", new Date());
-          return isValid(parsed) ? parsed : new Date();
-        })()
-      : new Date();
-
-    // Update date string when date changes (from calendar)
-    const handleDateSelect = (date: Date | undefined) => {
-      if (date) {
-        setDateStr(format(date, "yyyy-MM-dd"));
-        setCalendarOpen(false);
-      }
-    };
-
-    const loadStaffs = useCallback(async () => {
-      try {
-        const data = await staffService.getAll();
-        setStaffs(data);
-      } catch (error) {
-        console.error("Failed to load staffs:", error);
-        toast.error("Failed to load staffs");
-      }
-    }, []);
+  // Convert date string to Date object
+  const selectedDate = dateStr
+    ? (() => {
+        const parsed = parse(dateStr, "yyyy-MM-dd", new Date());
+        return isValid(parsed) ? parsed : new Date();
+      })()
+    : new Date();
 
     const loadRecords = useCallback(async () => {
       if (!dateStr) return;
@@ -106,18 +72,11 @@ export const AdminAttendanceMap = forwardRef<AdminAttendanceMapRef>(
     }, [selectedStaffId, dateStr]);
 
     useEffect(() => {
-      loadStaffs();
-    }, [loadStaffs]);
-
-    useEffect(() => {
       loadRecords();
     }, [loadRecords]);
 
     useImperativeHandle(ref, () => ({
-      refetch: () => {
-        loadStaffs();
-        loadRecords();
-      },
+      refetch: loadRecords,
     }));
 
     const dateWithRecords = new Set(records.map((r) => r.date));
@@ -138,47 +97,7 @@ export const AdminAttendanceMap = forwardRef<AdminAttendanceMapRef>(
     return (
       <Card>
         <CardHeader>
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            <CardTitle>Attendance Map</CardTitle>
-            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-              <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full sm:w-[240px] justify-start text-left font-normal",
-                      !selectedDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 size-4" />
-                    {selectedDate ? format(selectedDate, "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <CalendarComponent
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={handleDateSelect}
-                    modifiers={{
-                      hasRecords: (date) =>
-                        dateWithRecords.has(format(date, "yyyy-MM-dd")),
-                    }}
-                    modifiersClassNames={{
-                      hasRecords: "bg-green-100 dark:bg-green-900",
-                    }}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              <StaffSelector
-                staffs={staffs}
-                selectedStaffId={selectedStaffId}
-                onSelect={setSelectedStaffId}
-                placeholder="Select staff"
-                className="w-full sm:w-[240px]"
-              />
-            </div>
-          </div>
+          <CardTitle>Attendance Map</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {records.length === 0 ? (

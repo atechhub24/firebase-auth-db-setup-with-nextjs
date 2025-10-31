@@ -2,11 +2,9 @@
 
 import { useEffect, useState, useCallback, forwardRef, useImperativeHandle } from "react";
 import { Loader2 } from "lucide-react";
-import { useQueryState, parseAsString } from "nuqs";
 import { motion } from "motion/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { attendanceService, staffService } from "@/lib/services";
-import { StaffSelector } from "./staff-selector";
 import { AttendanceCard } from "./attendance-card";
 import type { Attendance } from "@/lib/types/attendance.type";
 import type { User as UserType } from "@/lib/types/user.type";
@@ -28,16 +26,17 @@ export interface AdminAttendanceRef {
   refetch: () => void;
 }
 
-export const AdminAttendance = forwardRef<AdminAttendanceRef>((_, ref) => {
+interface AdminAttendanceProps {
+  selectedStaffId: string;
+}
+
+export const AdminAttendance = forwardRef<
+  AdminAttendanceRef,
+  AdminAttendanceProps
+>(({ selectedStaffId }, ref) => {
   const [records, setRecords] = useState<Attendance[]>([]);
   const [staffs, setStaffs] = useState<UserType[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // URL state management
-  const [selectedStaffId, setSelectedStaffId] = useQueryState(
-    "staff",
-    parseAsString.withDefault("all")
-  );
 
   const loadStaffs = useCallback(async () => {
     try {
@@ -80,7 +79,7 @@ export const AdminAttendance = forwardRef<AdminAttendanceRef>((_, ref) => {
       loadStaffs();
       loadRecords();
     },
-  }));
+  }), [loadStaffs, loadRecords]);
 
   const getStaffInfo = (staffId: string) => {
     return staffs.find((staff) => staff.uid === staffId);
@@ -105,14 +104,6 @@ export const AdminAttendance = forwardRef<AdminAttendanceRef>((_, ref) => {
         <CardTitle>All Staff Attendance</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <StaffSelector
-          staffs={staffs}
-          selectedStaffId={selectedStaffId}
-          onSelect={setSelectedStaffId}
-          placeholder="Select staff"
-          className="w-full sm:w-80"
-        />
-
         {records.length === 0 ? (
           <div className="py-8 text-center text-muted-foreground">
             No attendance records found
