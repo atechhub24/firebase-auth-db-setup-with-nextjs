@@ -28,6 +28,8 @@ interface ImageEditorProps {
   open: boolean;
   aspectRatio?: number;
   circularCrop?: boolean;
+  title?: string;
+  description?: string;
 }
 
 export function ImageEditor({
@@ -37,6 +39,8 @@ export function ImageEditor({
   open,
   aspectRatio = 1,
   circularCrop = true,
+  title = "Edit Image",
+  description = "Crop, rotate, and optimize your image. It will be converted to WEBP format for better compression.",
 }: ImageEditorProps) {
   const [imgSrc, setImgSrc] = useState<string>("");
   const [crop, setCrop] = useState<CropType>();
@@ -186,16 +190,13 @@ export function ImageEditor({
 
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onCancel()}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+      <DialogContent className="md:max-w-4xl max-h-[90vh] overflow-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Crop className="h-5 w-5" />
-            Edit Profile Picture
+            {title}
           </DialogTitle>
-          <DialogDescription>
-            Crop, rotate, and optimize your image. It will be converted to WEBP
-            format for better compression.
-          </DialogDescription>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -274,7 +275,10 @@ export function ImageEditor({
           <Button variant="outline" onClick={onCancel} disabled={isProcessing}>
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={isProcessing || !completedCrop}>
+          <Button
+            onClick={handleSave}
+            disabled={isProcessing || !completedCrop}
+          >
             {isProcessing ? "Processing..." : "Save & Upload"}
           </Button>
         </DialogFooter>
@@ -285,4 +289,3 @@ export function ImageEditor({
     </Dialog>
   );
 }
-
