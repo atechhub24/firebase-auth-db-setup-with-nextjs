@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { Clock, Calendar, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAppStore } from "@/hooks/use-app-store";
@@ -9,16 +9,14 @@ import { formatTime } from "@/lib/utils/date";
 import type { Attendance } from "@/lib/types/attendance.type";
 import { toast } from "sonner";
 
-export function AttendanceStats() {
+export interface AttendanceStatsRef {
+  refetch: () => void;
+}
+
+export const AttendanceStats = forwardRef<AttendanceStatsRef>((_, ref) => {
   const user = useAppStore((state) => state.user);
   const [todayRecord, setTodayRecord] = useState<Attendance | null>(null);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (user?.uid) {
-      loadTodayRecord();
-    }
-  }, [user?.uid]);
 
   const loadTodayRecord = async () => {
     if (!user?.uid) return;
@@ -33,6 +31,16 @@ export function AttendanceStats() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user?.uid) {
+      loadTodayRecord();
+    }
+  }, [user?.uid]);
+
+  useImperativeHandle(ref, () => ({
+    refetch: loadTodayRecord,
+  }));
 
   if (loading) {
     return (
@@ -76,29 +84,27 @@ export function AttendanceStats() {
                 {formatTime(todayRecord.punchInTime)}
               </span>
             </div>
-            {todayRecord.punchOutTime && (
-              <>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Clock className="size-4" />
-                    <span>Punch Out</span>
-                  </div>
-                  <span className="font-medium">
-                    {formatTime(todayRecord.punchOutTime)}
-                  </span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Clock className="size-4" />
+                <span>Punch Out</span>
+              </div>
+              <span className="font-medium">
+                {todayRecord.punchOutTime
+                  ? formatTime(todayRecord.punchOutTime)
+                  : "Not punched out"}
+              </span>
+            </div>
+            {todayRecord.punchOutTime && todayRecord.totalHours && (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Calendar className="size-4" />
+                  <span>Total Hours</span>
                 </div>
-                {todayRecord.totalHours && (
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Calendar className="size-4" />
-                      <span>Total Hours</span>
-                    </div>
-                    <span className="font-medium">
-                      {todayRecord.totalHours}h
-                    </span>
-                  </div>
-                )}
-              </>
+                <span className="font-medium">
+                  {todayRecord.totalHours}h
+                </span>
+              </div>
             )}
           </div>
         ) : (
@@ -109,5 +115,7 @@ export function AttendanceStats() {
       </CardContent>
     </Card>
   );
-}
+});
+
+AttendanceStats.displayName = "AttendanceStats";
 

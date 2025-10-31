@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +14,11 @@ const AttendanceMapClient = dynamic(
   { ssr: false }
 );
 
-export function AttendanceMap() {
+export interface AttendanceMapRef {
+  refetch: () => void;
+}
+
+export const AttendanceMap = forwardRef<AttendanceMapRef>((_, ref) => {
   const user = useAppStore((state) => state.user);
   const [records, setRecords] = useState<Attendance[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,6 +28,10 @@ export function AttendanceMap() {
       loadRecords();
     }
   }, [user?.uid]);
+
+  useImperativeHandle(ref, () => ({
+    refetch: loadRecords,
+  }));
 
   const loadRecords = async () => {
     if (!user?.uid) return;
@@ -85,5 +93,7 @@ export function AttendanceMap() {
       </CardContent>
     </Card>
   );
-}
+});
+
+AttendanceMap.displayName = "AttendanceMap";
 

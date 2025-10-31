@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, forwardRef, useImperativeHandle } from "react";
 import { useQueryState, parseAsString } from "nuqs";
 import { Clock, Calendar, TrendingUp, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +16,11 @@ import { attendanceService } from "@/lib/services";
 import type { AttendanceAnalytics as AttendanceAnalyticsType } from "@/lib/types/attendance.type";
 import { toast } from "sonner";
 
-export function AttendanceAnalytics() {
+export interface AttendanceAnalyticsRef {
+  refetch: () => void;
+}
+
+export const AttendanceAnalytics = forwardRef<AttendanceAnalyticsRef>((_, ref) => {
   const user = useAppStore((state) => state.user);
   const [analytics, setAnalytics] = useState<AttendanceAnalyticsType | null>(
     null
@@ -54,6 +58,10 @@ export function AttendanceAnalytics() {
       loadAnalytics();
     }
   }, [user?.uid, loadAnalytics]);
+
+  useImperativeHandle(ref, () => ({
+    refetch: loadAnalytics,
+  }));
 
   if (loading) {
     return (
@@ -127,4 +135,6 @@ export function AttendanceAnalytics() {
       </CardContent>
     </Card>
   );
-}
+});
+
+AttendanceAnalytics.displayName = "AttendanceAnalytics";

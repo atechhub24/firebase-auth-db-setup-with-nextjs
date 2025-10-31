@@ -102,15 +102,13 @@ class AttendanceService {
   }
 
   /**
-   * Get today's punch in record for a staff member
+   * Get today's attendance record for a staff member (including completed)
    */
   async getTodayPunchIn(staffId: string): Promise<Attendance | null> {
     const today = new Date().toISOString().split("T")[0];
     const records = await this.getByStaffId(staffId);
-    return (
-      records.find((record) => record.date === today && !record.punchOutTime) ||
-      null
-    );
+    // Return today's record whether completed or not
+    return records.find((record) => record.date === today) || null;
   }
 
   /**

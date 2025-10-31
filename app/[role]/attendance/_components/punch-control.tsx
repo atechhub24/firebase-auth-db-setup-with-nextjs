@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, forwardRef, useImperativeHandle } from "react";
 import { Clock, MapPin, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +12,11 @@ import { formatDateTime } from "@/lib/utils/date";
 import type { Attendance } from "@/lib/types/attendance.type";
 import { toast } from "sonner";
 
-export function PunchControl() {
+export interface PunchControlRef {
+  refetch: () => void;
+}
+
+export const PunchControl = forwardRef<PunchControlRef>((_, ref) => {
   const user = useAppStore((state) => state.user);
   const [todayRecord, setTodayRecord] = useState<Attendance | null>(null);
   const [loading, setLoading] = useState(true);
@@ -71,6 +75,10 @@ export function PunchControl() {
     checkLocationPermission();
     loadTodayRecord();
   }, [checkLocationPermission, loadTodayRecord]);
+
+  useImperativeHandle(ref, () => ({
+    refetch: loadTodayRecord,
+  }));
 
   const requestLocationPermission = async () => {
     try {
@@ -157,11 +165,15 @@ export function PunchControl() {
     }
   };
 
+  // Disable punch in if there's any record for today (even if punched out)
   const canPunchIn = !todayRecord && locationPermission === "granted";
+  // Disable punch out if already punched out or no record exists
   const canPunchOut =
     todayRecord &&
     !todayRecord.punchOutTime &&
     locationPermission === "granted";
+  // Both buttons disabled if already punched out today
+  const isCompleted = todayRecord?.punchOutTime !== undefined;
 
   if (loading) {
     return (
@@ -258,7 +270,7 @@ export function PunchControl() {
         <div className="flex gap-2">
           <Button
             onClick={handlePunchIn}
-            disabled={!canPunchIn || punching}
+            disabled={!canPunchIn || punching || isCompleted}
             className="flex-1"
           >
             {punching ? (
@@ -272,7 +284,7 @@ export function PunchControl() {
           </Button>
           <Button
             onClick={handlePunchOut}
-            disabled={!canPunchOut || punching}
+            disabled={!canPunchOut || punching || isCompleted}
             variant="destructive"
             className="flex-1"
           >
@@ -289,4 +301,6 @@ export function PunchControl() {
       </CardContent>
     </Card>
   );
-}
+});
+
+PunchControl.displayName = "PunchControl";

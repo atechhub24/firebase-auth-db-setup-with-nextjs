@@ -1,7 +1,7 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { motion } from "motion/react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,7 +22,11 @@ const containerVariants = {
   },
 };
 
-export function AttendanceHistory() {
+export interface AttendanceHistoryRef {
+  refetch: () => void;
+}
+
+export const AttendanceHistory = forwardRef<AttendanceHistoryRef>((_, ref) => {
   const user = useAppStore((state) => state.user);
   const [records, setRecords] = useState<Attendance[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,6 +36,10 @@ export function AttendanceHistory() {
       loadRecords();
     }
   }, [user?.uid]);
+
+  useImperativeHandle(ref, () => ({
+    refetch: loadRecords,
+  }));
 
   const loadRecords = async () => {
     if (!user?.uid) return;
@@ -92,4 +100,6 @@ export function AttendanceHistory() {
       </CardContent>
     </Card>
   );
-}
+});
+
+AttendanceHistory.displayName = "AttendanceHistory";
