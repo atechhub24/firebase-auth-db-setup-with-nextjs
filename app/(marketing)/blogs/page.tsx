@@ -8,17 +8,23 @@ import { BlogFilters } from "./_components/blog-filters";
 import { BlogSortControls } from "./_components/blog-sort-controls";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
-import { useQueryState, parseAsArrayOf, parseAsString } from "nuqs";
+import {
+  useQueryState,
+  parseAsArrayOf,
+  parseAsString,
+  parseAsBoolean,
+} from "nuqs";
 import { motion, AnimatePresence } from "motion/react";
 import { staggerContainer, scaleIn } from "@/lib/utils/motion-variants";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 export default function BlogsPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [searchTerm] = useQueryState(
+  const [searchTerm, setSearchTerm] = useQueryState(
     "search",
     parseAsString.withDefault("")
   );
@@ -29,6 +35,14 @@ export default function BlogsPage() {
   const [selectedTags] = useQueryState(
     "tags",
     parseAsArrayOf(parseAsString).withDefault([])
+  );
+  const [selectedAuthor] = useQueryState(
+    "author",
+    parseAsString.withDefault("all")
+  );
+  const [showFeaturedOnly] = useQueryState(
+    "featured",
+    parseAsBoolean.withDefault(false)
   );
   const [sortOption] = useQueryState(
     "sort",
@@ -80,7 +94,20 @@ export default function BlogsPage() {
         selectedTags.length === 0 ||
         blog.tags?.some((tag) => selectedTags.includes(tag));
 
-      return matchesSearch && matchesCategory && matchesTag;
+      // Author filter
+      const matchesAuthor =
+        selectedAuthor === "all" || blog.author === selectedAuthor;
+
+      // Featured filter
+      const matchesFeatured = !showFeaturedOnly || blog.featured;
+
+      return (
+        matchesSearch &&
+        matchesCategory &&
+        matchesTag &&
+        matchesAuthor &&
+        matchesFeatured
+      );
     });
 
     // Sort blogs
@@ -102,7 +129,15 @@ export default function BlogsPage() {
     });
 
     return filtered;
-  }, [blogs, searchTerm, selectedCategories, selectedTags, sortOption]);
+  }, [
+    blogs,
+    searchTerm,
+    selectedCategories,
+    selectedTags,
+    selectedAuthor,
+    showFeaturedOnly,
+    sortOption,
+  ]);
 
   if (loading) {
     return (
@@ -201,7 +236,29 @@ export default function BlogsPage() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.25 }}
         >
-          <BlogSortControls />
+          {/* Search, Sort, and View Controls in One Row */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 p-4 rounded-lg border-2 border-border/50 bg-card/50 backdrop-blur-sm shadow-sm"
+          >
+            {/* Search Bar */}
+            <div className="relative flex-1 min-w-0">
+              <div className="relative flex items-center">
+                <Search className="absolute left-3 h-4 w-4 text-muted-foreground z-10" />
+                <Input
+                  placeholder="Search blogs..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value || null)}
+                  className="h-9 pl-9 pr-3 text-sm border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-300 placeholder:text-muted-foreground"
+                />
+              </div>
+            </div>
+
+            {/* Sort and View Controls */}
+            <BlogSortControls />
+          </motion.div>
 
           <AnimatePresence mode="popLayout">
             {filteredBlogs.length === 0 ? (

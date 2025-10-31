@@ -24,12 +24,7 @@ export function BlogSortControls() {
   );
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.15 }}
-      className="flex items-center justify-between gap-4"
-    >
+    <div className="flex items-center gap-3 shrink-0">
       <Select value={sortOption} onValueChange={setSortOption}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Sort by" />
@@ -90,6 +85,6 @@ export function BlogSortControls() {
           </span>
         </motion.button>
       </div>
-    </motion.div>
+    </div>
   );
 }
