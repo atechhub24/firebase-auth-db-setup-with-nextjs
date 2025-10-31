@@ -11,14 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { attendanceService, staffService } from "@/lib/services";
+import { StaffSelector } from "./staff-selector";
 import type { Attendance } from "@/lib/types/attendance.type";
 import type { User } from "@/lib/types/user.type";
 import { formatDate, formatTime } from "@/lib/utils/date";
@@ -86,19 +80,13 @@ export function AdminAttendanceTable() {
         <CardTitle>All Staff Attendance</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Select value={selectedStaffId} onValueChange={setSelectedStaffId}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Select staff" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Staff</SelectItem>
-            {staffs.map((staff) => (
-              <SelectItem key={staff.uid} value={staff.uid}>
-                {staff.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <StaffSelector
+          staffs={staffs}
+          selectedStaffId={selectedStaffId}
+          onSelect={setSelectedStaffId}
+          placeholder="Select staff"
+          className="w-full sm:w-80"
+        />
 
         {records.length === 0 ? (
           <div className="py-8 text-center text-muted-foreground">
