@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, forwardRef, useImperativeHandle } from "react";
 import { Loader2 } from "lucide-react";
 import { useQueryState, parseAsString } from "nuqs";
 import { motion } from "motion/react";
@@ -24,7 +24,11 @@ const containerVariants = {
   },
 };
 
-export function AdminAttendance() {
+export interface AdminAttendanceRef {
+  refetch: () => void;
+}
+
+export const AdminAttendance = forwardRef<AdminAttendanceRef>((_, ref) => {
   const [records, setRecords] = useState<Attendance[]>([]);
   const [staffs, setStaffs] = useState<UserType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,6 +74,13 @@ export function AdminAttendance() {
   useEffect(() => {
     loadRecords();
   }, [loadRecords]);
+
+  useImperativeHandle(ref, () => ({
+    refetch: () => {
+      loadStaffs();
+      loadRecords();
+    },
+  }));
 
   const getStaffInfo = (staffId: string) => {
     return staffs.find((staff) => staff.uid === staffId);
@@ -129,4 +140,6 @@ export function AdminAttendance() {
       </CardContent>
     </Card>
   );
-}
+});
+
+AdminAttendance.displayName = "AdminAttendance";

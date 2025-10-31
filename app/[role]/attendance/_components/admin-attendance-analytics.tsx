@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, forwardRef, useImperativeHandle } from "react";
 import { useQueryState, parseAsString } from "nuqs";
 import { Users, Clock, TrendingUp, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,7 +15,11 @@ import { attendanceService } from "@/lib/services";
 import type { AdminAnalytics } from "@/lib/types/attendance.type";
 import { toast } from "sonner";
 
-export function AdminAttendanceAnalytics() {
+export interface AdminAttendanceAnalyticsRef {
+  refetch: () => void;
+}
+
+export const AdminAttendanceAnalytics = forwardRef<AdminAttendanceAnalyticsRef>((_, ref) => {
   const [analytics, setAnalytics] = useState<AdminAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -45,6 +49,10 @@ export function AdminAttendanceAnalytics() {
   useEffect(() => {
     loadAnalytics();
   }, [loadAnalytics]);
+
+  useImperativeHandle(ref, () => ({
+    refetch: loadAnalytics,
+  }));
 
   if (loading) {
     return (
@@ -129,4 +137,6 @@ export function AdminAttendanceAnalytics() {
       </CardContent>
     </Card>
   );
-}
+});
+
+AdminAttendanceAnalytics.displayName = "AdminAttendanceAnalytics";
