@@ -3,22 +3,19 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { useQueryState, parseAsString, useQueryStates } from "nuqs";
 import { motion } from "motion/react";
-import { RotateCcw, RefreshCw, MapPin, List, CalendarIcon } from "lucide-react";
+import { MapPin, List } from "lucide-react";
 import { format, parse, isValid } from "date-fns";
 import { useAppStore } from "@/hooks/use-app-store";
 import { StaffAttendance } from "./_components/staff-attendance";
 import { AdminAttendanceAnalytics } from "./_components/admin-attendance-analytics";
 import { AdminAttendance } from "./_components/admin-attendance";
 import { AdminAttendanceMap } from "./_components/admin-attendance-map";
-import { StaffSelector } from "./_components/staff-selector";
+import { AttendanceFilters } from "./_components/attendance-filters";
+import { AttendanceActions } from "./_components/attendance-actions";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { staffService } from "@/lib/services";
 import type { User } from "@/lib/types/user.type";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
 const tabs = [
   { id: "map", label: "Map", icon: MapPin },
@@ -64,12 +61,15 @@ export default function AttendancePage() {
       })()
     : new Date();
 
-  const handleDateSelect = (date: Date | undefined) => {
-    if (date) {
-      setDateStr(format(date, "yyyy-MM-dd"));
-      setCalendarOpen(false);
-    }
-  };
+  const handleDateSelect = useCallback(
+    (date: Date | undefined) => {
+      if (date) {
+        setDateStr(format(date, "yyyy-MM-dd"));
+        setCalendarOpen(false);
+      }
+    },
+    [setDateStr]
+  );
 
   const loadStaffs = useCallback(async () => {
     try {
@@ -141,62 +141,20 @@ export default function AttendancePage() {
               })}
             </TabsList>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:flex-1 lg:flex-initial min-w-0">
-              <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full sm:w-1/2 lg:w-[240px] justify-start text-left font-normal",
-                      !selectedDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 size-4" />
-                    {selectedDate ? format(selectedDate, "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <CalendarComponent
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={handleDateSelect}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              <div className="w-full sm:w-1/2 lg:w-[240px] min-w-0">
-                <StaffSelector
-                  staffs={staffs}
-                  selectedStaffId={selectedStaffId || "all"}
-                  onSelect={setSelectedStaffId}
-                  placeholder="Select staff"
-                  className="w-full"
-                />
-              </div>
-            </div>
+            <AttendanceFilters
+              selectedDate={selectedDate}
+              selectedStaffId={selectedStaffId || "all"}
+              staffs={staffs}
+              calendarOpen={calendarOpen}
+              onDateSelect={handleDateSelect}
+              onStaffSelect={setSelectedStaffId}
+              onCalendarOpenChange={setCalendarOpen}
+            />
 
-            <div className="flex items-center gap-2 w-full sm:flex-1 lg:flex-initial flex-shrink-0">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleResetFilters}
-                className="gap-2 flex-1 sm:w-1/2 lg:flex-initial"
-              >
-                <RotateCcw className="size-4" />
-                <span className="hidden sm:inline">Reset Filters</span>
-                <span className="sm:hidden">Reset</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRefetch}
-                className="gap-2 flex-1 sm:w-1/2 lg:flex-initial"
-              >
-                <RefreshCw className="size-4" />
-                <span className="hidden sm:inline">Refetch</span>
-                <span className="sm:hidden">Refresh</span>
-              </Button>
-            </div>
+            <AttendanceActions
+              onResetFilters={handleResetFilters}
+              onRefetch={handleRefetch}
+            />
           </div>
 
           <TabsContent value="map" className="mt-0">
