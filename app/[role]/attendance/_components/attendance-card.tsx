@@ -2,6 +2,7 @@
 
 import { MapPin, Clock, Calendar, CheckCircle2, XCircle } from "lucide-react";
 import { motion } from "motion/react";
+import type { Variants } from "motion/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Attendance } from "@/lib/types/attendance.type";
 import type { User } from "@/lib/types/user.type";
@@ -22,14 +23,14 @@ const getInitials = (name: string) => {
     .slice(0, 2);
 };
 
-export const cardVariants = {
+export const cardVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
       duration: 0.4,
-      ease: [0.22, 1, 0.36, 1],
+      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
     },
   },
 };
