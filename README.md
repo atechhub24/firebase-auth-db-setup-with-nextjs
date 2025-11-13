@@ -135,4 +135,3 @@ BIome doubles as linter and formatter; keep CI happy by running `bun run format 
 - Command palette + sidebar structure lives in `components/layout` and `components/core` — adjust navigation there.
 - UploadThing routes expect a token; disable by omitting `UPLOADTHING_TOKEN` or replacing handlers under `app/api/uploadthing`.
 - For deployment (Vercel, Firebase Hosting, etc.), ensure env vars are present and public URLs are whitelisted in your Firebase console.
-
