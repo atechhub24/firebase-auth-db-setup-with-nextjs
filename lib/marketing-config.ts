@@ -8,9 +8,13 @@ export const marketingSite = {
   url: "https://atechhub247.com",
   domain: "atechhub247.com",
   contactEmail: "info@atechhub247.com",
+  contactPhone: "+1 (555) 247-0000",
   social: {
     twitter: "https://twitter.com/atechhub247",
     github: "https://github.com/atechhub24",
+    linkedin: "https://www.linkedin.com/company/atechhub247",
+    youtube: "https://www.youtube.com/@atechhub247",
+    facebook: "https://www.facebook.com/atechhub247",
   },
   stack: [
     "Next.js App Router + React 19 + Turbopack",
