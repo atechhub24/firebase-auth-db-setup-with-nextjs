@@ -4,7 +4,16 @@ import Link from "next/link";
 import { marketingSite } from "@/lib/marketing-config";
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
-import { Twitter, Github, Linkedin, Phone, Mail, ArrowRight } from "lucide-react";
+import {
+  Twitter,
+  Github,
+  Linkedin,
+  Youtube,
+  Facebook,
+  Phone,
+  Mail,
+  ArrowRight,
+} from "lucide-react";
 
 export function MarketingFooter() {
   const year = new Date().getFullYear();
@@ -47,7 +56,7 @@ export function MarketingFooter() {
               <ArrowRight className="size-4" />
             </Link>
           </Button>
-          <div className="flex items-center gap-4 text-muted-foreground">
+          <nav className="flex items-center gap-4 text-muted-foreground">
             <Link
               href={marketingSite.social.twitter}
               className="transition-colors hover:text-foreground"
@@ -69,7 +78,21 @@ export function MarketingFooter() {
               <span className="sr-only">LinkedIn</span>
               <Linkedin className="size-4" />
             </Link>
-          </div>
+            <Link
+              href={marketingSite.social.youtube}
+              className="transition-colors hover:text-foreground"
+            >
+              <span className="sr-only">YouTube</span>
+              <Youtube className="size-4" />
+            </Link>
+            <Link
+              href={marketingSite.social.facebook}
+              className="transition-colors hover:text-foreground"
+            >
+              <span className="sr-only">Facebook</span>
+              <Facebook className="size-4" />
+            </Link>
+          </nav>
         </div>
       </motion.div>
     </footer>
