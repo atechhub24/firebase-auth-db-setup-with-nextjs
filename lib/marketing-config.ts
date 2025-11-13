@@ -1,10 +1,10 @@
 export const marketingSite = {
-  name: "Firebase Auth + Realtime DB Starter (Next.js 15) ⚡️",
-  title: "Firebase Auth + Realtime DB Starter (Next.js 15) ⚡️",
+  name: "Firebase Auth + Realtime DB Starter ⚡️",
+  title: "Firebase Auth + Realtime DB Starter ⚡️",
   description:
-    "Public marketing pages showcasing product updates, blog posts, and resources from atechhub.",
+    "Public marketing pages showcasing auth updates, blog posts, & resources from atechhub.",
   tagline:
-    "Next.js 15.5 + Firebase starter for role-aware dashboards, attendance tooling, and blog CMS—powered by shadcn/ui and Turbopack.",
+    "Next.js + Firebase starter for role-aware dashboards, attendance tooling, & blog powered by shadcn/ui.",
   url: "https://atechhub247.com",
   domain: "atechhub247.com",
   contactEmail: "info@atechhub247.com",
