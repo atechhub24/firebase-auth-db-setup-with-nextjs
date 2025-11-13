@@ -4,6 +4,17 @@ A batteries-included Next.js 15.5 app wired to Firebase Authentication, Realtime
 
 ## Stack
 
+<p align="left">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nextjs/nextjs-original.svg" alt="Next.js" title="Next.js App Router" height="48" />
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg" alt="React 19" title="React 19" height="48" />
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg" alt="TypeScript" title="TypeScript" height="48" />
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg" alt="JavaScript" title="JavaScript (Turbopack runtime)" height="48" />
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg" alt="Tailwind CSS" title="Tailwind CSS v4" height="48" />
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/firebase/firebase-original.svg" alt="Firebase" title="Firebase Auth + Realtime DB" height="48" />
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg" alt="HTML5" title="App Router HTML streaming" height="48" />
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg" alt="CSS3" title="Tailwind preflight + custom styles" height="48" />
+</p>
+
 - Next.js App Router + React 19 + Turbopack dev/build
 - Firebase Auth + Realtime Database via `@atechhub/firebase`
 - Zustand app store with role-based guards
@@ -90,6 +101,14 @@ UPLOADTHING_TOKEN=optional_uploadthing_token
 ```
 
 `lib/env.ts` validates this schema at runtime; missing keys throw a descriptive error during boot so you catch misconfiguration early.
+
+## Firebase Setup Helper
+
+1. Visit the [Firebase Console](https://console.firebase.google.com/) and create a Web app inside your project. Copy the generated `firebaseConfig` object.
+2. Open the companion tool at [firebase.atechhub247.com](https://firebase.atechhub247.com/) and paste the config into the **Firebase Config → .env Converter**. Select the **Next.js** output, then copy the generated `.env.local` snippet.
+3. Paste those values into your local `.env.local` file (matching the keys listed above) and restart the dev server so the new env vars load.
+
+This workflow keeps secrets consistent while avoiding typos in your environment files. The converter also exposes a Vite format if you need to reuse the same Firebase project elsewhere.
 
 ## Firebase Authentication Flow
 
