@@ -1,36 +1,138 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Firebase Auth + Realtime DB Starter (Next.js 15)
+
+A batteries-included Next.js 15.5 app wired to Firebase Authentication, Realtime Database, and an opinionated admin/marketing UI built on top of shadcn/ui. Use it as a reference or starter for SaaS dashboards that need role-aware access, attendance tracking, and editorial tooling out of the box.
+
+## Stack
+
+- Next.js App Router + React 19 + Turbopack dev/build
+- Firebase Auth + Realtime Database via `@atechhub/firebase`
+- Zustand app store with role-based guards
+- Tailwind CSS v4 + shadcn/ui component library (Radix primitives)
+- UploadThing for asset uploads, Leaflet + Recharts for maps/charts, Tiptap rich text editor
+- Biome for linting/formatting
+
+## Highlights
+
+- Auth flows (sign up/sign in) backed by Firebase, configurable via `.env.local`
+- `FirebaseProvider` wires auth state to Zustand and protects auth routes
+- Role-aware dashboard shell (`admin`, `staff`) with sidebar, header, breadcrumbs, and command palette
+- Attendance workspace with analytics, history, maps, and punch controls
+- Blog CMS pages (marketing list + role-restricted CRUD surface)
+- Settings pages for profile + password management
+- Marketing blog listing and slug pages for public consumption
+- Extensive shadcn/ui component exports (`components/ui`) ready for reuse
+- Service layer abstractions under `lib/services` and shared types under `lib/types`
+
+## Project Structure
+
+```text
+app/
+  (auth)/           # Public auth routes & shared auth form
+  (marketing)/      # Public marketing pages (blogs, slug detail)
+  [role]/           # Role-guarded dashboard shell (admin/staff)
+    attendance/     # Attendance analytics + calendar + maps
+    blogs/          # Admin blog CRUD (list/create/edit)
+    dashboard/      # Role landing page
+    settings/       # Profile & password settings
+    staffs/         # Staff directory + CRUD surfaces
+  api/uploadthing/  # UploadThing handlers
+components/
+  core/             # Command palette, breadcrumb, profile dropdown
+  layout/           # Sidebar + header wrappers
+  providers/        # Firebase + theme providers
+  ui/               # shadcn/ui exports (accordion, dialog, etc.)
+hooks/              # Zustand store, auth guard, menu items, mobile detection
+lib/
+  env.ts            # Type-safe env validation + Firebase config
+  services/         # Attendance/blog/staff service helpers
+  types/            # Shared TypeScript types
+  utils/            # Breadcrumb, date, motion, upload helpers
+public/             # Static assets (icons, illustrations)
+```
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun install
+bun run dev         # next dev --turbopack on http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Need to target a specific role? Navigate to `/admin/...` or `/staff/...` — layouts and menu items adapt based on the stored user role.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Share Your Local Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Use an SSH reverse tunnel to expose the dev server for external validators:
 
-## Learn More
+```bash
+ssh srv.us -R 1:localhost:3000
+```
 
-To learn more about Next.js, take a look at the following resources:
+That command returns a publicly reachable HTTPS URL (for example, `https://<random>.srv.us`) pointing to your local port `3000`. Keep the tunnel running while you:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Validate Open Graph/Twitter cards from a real internet origin.
+- Test webhook callbacks or integrations that need a public endpoint.
+- Share in-progress work with teammates without deploying.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Environment Variables
 
-## Deploy on Vercel
+Create `.env.local` at the project root:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+NEXT_PUBLIC_FIREBASE_API_KEY=xxx
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=xxx.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_DATABASE_URL=https://xxx.firebaseio.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=xxx
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=xxx.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=xxx
+NEXT_PUBLIC_FIREBASE_APP_ID=1:xxx:web:xxx
+NEXT_PUBLIC_FIREBASE_AUTH_URL=https://<cloud-function-host>/auth
+UPLOADTHING_TOKEN=optional_uploadthing_token
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`lib/env.ts` validates this schema at runtime; missing keys throw a descriptive error during boot so you catch misconfiguration early.
+
+## Firebase Authentication Flow
+
+- `components/providers/firebase-provider.tsx` initializes Firebase (once) and `configureAuth` from `@atechhub/firebase`.
+- Auth state changes subscribe to the Realtime Database (`users/{uid}`) and hydrate `useAppStore`.
+- `useAuthGuard` redirects authenticated users away from `/signin`.
+- Role-based menu items come from `hooks/use-menu-items.ts`, matching `UserRole` types at `lib/types/user.type.ts`.
+
+To extend roles, update the type + navigation map and ensure your database users carry the new `role`.
+
+## Attendance & Staff Modules
+
+- `app/[role]/attendance` bundles analytics, map, calendar, and punch widgets, reusing service helpers from `lib/services/attendance.service.ts`.
+- Staff management surfaces modals/dialogs (`components/ui`) for CRUD workflows, backed by `lib/services/staff.service.ts`.
+- Charts map to Recharts components via `components/ui/chart.tsx`.
+
+## Blog & Marketing Surface
+
+- Public marketing index under `app/(marketing)/blogs/page.tsx` with filters (`author-combobox`, `tags-multi-select`).
+- Admin CRUD pages reuse shared forms (`blog-form.tsx`) and UploadThing integration for media.
+- Tiptap rich text editor (`components/ui/rich-text-editor.tsx`) powers content editing/rendering.
+
+## Meta & Asset Validation
+
+- **Open Graph preview**: capture the tunnel URL from above and drop it into [opengraph.dev](https://opengraph.dev/). The tool fetches your page as social bots do, letting you verify titles, descriptions, and OG images quickly.
+- **Favicon generation**: export high-res artwork (SVG or PNG) and feed it to [favicon.io/favicon-converter](https://favicon.io/favicon-converter/). It outputs favicon.ico plus platform-specific PNGs you can place under `public/`.
+
+## Scripts & Tooling
+
+| Command          | Description                  |
+| ---------------- | ---------------------------- |
+| `bun run dev`    | Start Next.js with Turbopack |
+| `bun run build`  | Production build (Turbopack) |
+| `bun run start`  | Serve production build       |
+| `bun run lint`   | Run Biome checks             |
+| `bun run format` | Format with Biome            |
+
+BIome doubles as linter and formatter; keep CI happy by running `bun run format && bun run lint` before pushing.
+
+## Customization Notes
+
+- Tailwind CSS v4 config lives in `postcss.config.mjs`; utility classes lean on semantic slots rather than custom theme tokens.
+- Command palette + sidebar structure lives in `components/layout` and `components/core` — adjust navigation there.
+- UploadThing routes expect a token; disable by omitting `UPLOADTHING_TOKEN` or replacing handlers under `app/api/uploadthing`.
+- For deployment (Vercel, Firebase Hosting, etc.), ensure env vars are present and public URLs are whitelisted in your Firebase console.
+
