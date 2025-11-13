@@ -5,4 +5,3 @@ export default function EditBlogLayout({
 }) {
   return children;
 }
-

@@ -31,17 +31,17 @@ export function AdminAttendanceView() {
 
   const [activeTab, setActiveTab] = useQueryState(
     "tab",
-    parseAsString.withDefault("map")
+    parseAsString.withDefault("map"),
   );
 
   // Filter state management
   const [selectedStaffId, setSelectedStaffId] = useQueryState(
     "staff",
-    parseAsString.withDefault("all")
+    parseAsString.withDefault("all"),
   );
   const [dateStr, setDateStr] = useQueryState(
     "date",
-    parseAsString.withDefault(format(new Date(), "yyyy-MM-dd"))
+    parseAsString.withDefault(format(new Date(), "yyyy-MM-dd")),
   );
 
   // Get all query state setters for reset
@@ -66,7 +66,7 @@ export function AdminAttendanceView() {
         setCalendarOpen(false);
       }
     },
-    [setDateStr]
+    [setDateStr],
   );
 
   const loadStaffs = useCallback(async () => {

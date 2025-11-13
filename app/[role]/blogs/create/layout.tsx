@@ -5,4 +5,3 @@ export default function CreateBlogLayout({
 }) {
   return children;
 }
-

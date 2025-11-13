@@ -139,9 +139,7 @@ export default function BlogsPage() {
               <FileText className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-xl sm:text-2xl font-bold">
-                {stats.total}
-              </div>
+              <div className="text-xl sm:text-2xl font-bold">{stats.total}</div>
               <p className="text-xs text-muted-foreground">All blog posts</p>
             </CardContent>
           </Card>
@@ -237,4 +235,3 @@ export default function BlogsPage() {
     </div>
   );
 }
-

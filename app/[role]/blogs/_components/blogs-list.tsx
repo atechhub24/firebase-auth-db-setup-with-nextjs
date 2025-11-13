@@ -18,10 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Blog, BlogCategory, BlogStatus } from "@/lib/types/blog.type";
-import {
-  Plus,
-  Search,
-} from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState, useMemo } from "react";
 import { motion } from "motion/react";
@@ -61,7 +58,7 @@ export function BlogsList({ blogs, onRefresh }: BlogsListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<BlogStatus | "all">("all");
   const [categoryFilter, setCategoryFilter] = useState<BlogCategory | "all">(
-    "all"
+    "all",
   );
   const [sortBy, setSortBy] = useState<"date" | "alphabetical">("date");
   const [sortOrder, setSortOrder] = useState<"new" | "old">("new");
@@ -76,7 +73,7 @@ export function BlogsList({ blogs, onRefresh }: BlogsListProps) {
         blog.excerpt?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         blog.author?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         blog.tags?.some((tag) =>
-          tag.toLowerCase().includes(searchTerm.toLowerCase())
+          tag.toLowerCase().includes(searchTerm.toLowerCase()),
         );
 
       const matchesStatus =
@@ -91,13 +88,9 @@ export function BlogsList({ blogs, onRefresh }: BlogsListProps) {
     filtered = [...filtered].sort((a, b) => {
       if (sortBy === "date") {
         const aTime =
-          typeof a.createdAt === "string"
-            ? new Date(a.createdAt).getTime()
-            : 0;
+          typeof a.createdAt === "string" ? new Date(a.createdAt).getTime() : 0;
         const bTime =
-          typeof b.createdAt === "string"
-            ? new Date(b.createdAt).getTime()
-            : 0;
+          typeof b.createdAt === "string" ? new Date(b.createdAt).getTime() : 0;
         return sortOrder === "new" ? bTime - aTime : aTime - bTime;
       } else {
         // Alphabetical
@@ -216,11 +209,7 @@ export function BlogsList({ blogs, onRefresh }: BlogsListProps) {
           className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
         >
           {filteredBlogs.map((blog) => (
-            <BlogCard
-              key={blog.id}
-              blog={blog}
-              onDelete={openDeleteDialog}
-            />
+            <BlogCard key={blog.id} blog={blog} onDelete={openDeleteDialog} />
           ))}
         </motion.div>
       )}
@@ -234,4 +223,3 @@ export function BlogsList({ blogs, onRefresh }: BlogsListProps) {
     </div>
   );
 }
-

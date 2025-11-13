@@ -8,12 +8,7 @@ import {
   parseAsBoolean,
   parseAsString,
 } from "nuqs";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
@@ -49,7 +44,10 @@ const categories: BlogCategory[] = [
   "general",
 ];
 
-const categoryIcons: Record<BlogCategory, React.ComponentType<{ className?: string }>> = {
+const categoryIcons: Record<
+  BlogCategory,
+  React.ComponentType<{ className?: string }>
+> = {
   health: Heart,
   news: Newspaper,
   tips: Lightbulb,
@@ -62,33 +60,36 @@ export function BlogFilters({ blogs }: BlogFiltersProps) {
   // URL Query State
   const [selectedCategories, setSelectedCategories] = useQueryState(
     "categories",
-    parseAsArrayOf(parseAsString).withDefault([])
+    parseAsArrayOf(parseAsString).withDefault([]),
   );
 
   const [selectedTags, setSelectedTags] = useQueryState(
     "tags",
-    parseAsArrayOf(parseAsString).withDefault([])
+    parseAsArrayOf(parseAsString).withDefault([]),
   );
 
   const [selectedAuthor, setSelectedAuthor] = useQueryState(
     "author",
-    parseAsString.withDefault("all")
+    parseAsString.withDefault("all"),
   );
 
   const [showFeaturedOnly, setShowFeaturedOnly] = useQueryState(
     "featured",
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false),
   );
 
   // Get unique tags and authors from blogs
   const allTags = useMemo(
     () => Array.from(new Set(blogs.flatMap((blog) => blog.tags || []))).sort(),
-    [blogs]
+    [blogs],
   );
 
   const allAuthors = useMemo(
-    () => Array.from(new Set(blogs.map((blog) => blog.author).filter(Boolean))).sort(),
-    [blogs]
+    () =>
+      Array.from(
+        new Set(blogs.map((blog) => blog.author).filter(Boolean)),
+      ).sort(),
+    [blogs],
   );
 
   const handleCategoryToggle = (category: BlogCategory) => {

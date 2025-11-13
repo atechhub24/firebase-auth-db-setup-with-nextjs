@@ -3,7 +3,11 @@
 import { CalendarIcon } from "lucide-react";
 import { format, parse, isValid } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { StaffSelector } from "./staff-selector";
 import type { User } from "@/lib/types/user.type";
@@ -36,7 +40,7 @@ export function AttendanceFilters({
             variant="outline"
             className={cn(
               "w-full sm:w-1/2 lg:w-[240px] justify-start text-left font-normal",
-              !selectedDate && "text-muted-foreground"
+              !selectedDate && "text-muted-foreground",
             )}
           >
             <CalendarIcon className="mr-2 size-4" />
@@ -64,4 +68,3 @@ export function AttendanceFilters({
     </div>
   );
 }
-

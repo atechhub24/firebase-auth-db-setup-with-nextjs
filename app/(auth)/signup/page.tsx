@@ -19,12 +19,12 @@ export default function SignUpPage() {
       if (error instanceof Error) {
         if (error.message.includes("email-already-in-use")) {
           throw new Error(
-            "This email is already registered. Please sign in instead."
+            "This email is already registered. Please sign in instead.",
           );
         }
         if (error.message.includes("weak-password")) {
           throw new Error(
-            "Password is too weak. Please use a stronger password."
+            "Password is too weak. Please use a stronger password.",
           );
         }
         if (error.message.includes("invalid-email")) {

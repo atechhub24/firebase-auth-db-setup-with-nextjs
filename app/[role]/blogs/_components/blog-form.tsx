@@ -49,7 +49,10 @@ import { mutate } from "@atechhub/firebase";
 const blogSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   slug: z.string().min(1, "Slug is required"),
-  excerpt: z.string().min(10, "Excerpt must be at least 10 characters").max(300, "Excerpt must be at most 300 characters"),
+  excerpt: z
+    .string()
+    .min(10, "Excerpt must be at least 10 characters")
+    .max(300, "Excerpt must be at most 300 characters"),
   content: z
     .any()
     .refine((val) => val && typeof val === "object" && "type" in val, {
@@ -183,7 +186,8 @@ export function BlogForm({ blog }: BlogFormProps) {
         form.setValue("coverImage", blog.coverImage);
         setImagePreview(blog.coverImage);
       }
-      if (blog.coverImageFileKey) form.setValue("coverImageFileKey", blog.coverImageFileKey);
+      if (blog.coverImageFileKey)
+        form.setValue("coverImageFileKey", blog.coverImageFileKey);
       if (blog.author) form.setValue("author", blog.author);
       if (blog.category) form.setValue("category", blog.category);
       if (blog.tags) form.setValue("tags", blog.tags);
@@ -201,7 +205,7 @@ export function BlogForm({ blog }: BlogFormProps) {
         `/api/uploadthing/delete?fileKey=${encodeURIComponent(fileKey)}`,
         {
           method: "DELETE",
-        }
+        },
       );
 
       if (!response.ok) {
@@ -238,7 +242,8 @@ export function BlogForm({ blog }: BlogFormProps) {
 
     // Store previous image fileKey before upload (for deletion later)
     // Check both blog prop and form value
-    const currentFileKey = blog?.coverImageFileKey || form.getValues("coverImageFileKey");
+    const currentFileKey =
+      blog?.coverImageFileKey || form.getValues("coverImageFileKey");
     if (currentFileKey) {
       setPreviousFileKey(currentFileKey);
     }
@@ -272,7 +277,7 @@ export function BlogForm({ blog }: BlogFormProps) {
       : "0";
 
     toast.success(
-      `Image optimized: ${originalSize} → ${optimizedSize} (${compressionRatio}% reduction)`
+      `Image optimized: ${originalSize} → ${optimizedSize} (${compressionRatio}% reduction)`,
     );
 
     // Delete old file BEFORE uploading new one (if fileKey exists)
@@ -298,7 +303,7 @@ export function BlogForm({ blog }: BlogFormProps) {
           `${blogId}-${userId}-${Date.now()}-cover.webp`,
           {
             type: "image/webp",
-          }
+          },
         ),
       ]);
     } catch (error) {
@@ -318,12 +323,13 @@ export function BlogForm({ blog }: BlogFormProps) {
   const handleRemoveTag = (tag: string) => {
     form.setValue(
       "tags",
-      watchedTags.filter((t) => t !== tag)
+      watchedTags.filter((t) => t !== tag),
     );
   };
 
   const handleRemoveCoverImage = async () => {
-    const fileKeyToRemove = blog?.coverImageFileKey || form.getValues("coverImageFileKey");
+    const fileKeyToRemove =
+      blog?.coverImageFileKey || form.getValues("coverImageFileKey");
 
     form.setValue("coverImage", "");
     form.setValue("coverImageFileKey", "");
@@ -385,7 +391,7 @@ export function BlogForm({ blog }: BlogFormProps) {
     } catch (error) {
       console.error("Error saving blog:", error);
       toast.error(
-        `Failed to ${blog ? "update" : "create"} blog. Please try again.`
+        `Failed to ${blog ? "update" : "create"} blog. Please try again.`,
       );
     } finally {
       setIsLoading(false);
@@ -450,10 +456,7 @@ export function BlogForm({ blog }: BlogFormProps) {
                     <FormItem>
                       <FormLabel>Slug</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          placeholder="url-friendly-slug"
-                        />
+                        <Input {...field} placeholder="url-friendly-slug" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -529,9 +532,10 @@ export function BlogForm({ blog }: BlogFormProps) {
                             )}
                           </div>
                           <p className="text-xs text-muted-foreground">
-                            Select an image to upload (max 10MB). You can crop, rotate,
-                            and optimize before upload. Images are automatically
-                            converted to WEBP format for better compression.
+                            Select an image to upload (max 10MB). You can crop,
+                            rotate, and optimize before upload. Images are
+                            automatically converted to WEBP format for better
+                            compression.
                           </p>
                         </div>
                       </FormControl>
@@ -788,7 +792,9 @@ export function BlogForm({ blog }: BlogFormProps) {
             setShowImageEditor(false);
             setSelectedFile(null);
             // Reset to previous preview on cancel
-            setImagePreview(blog?.coverImage || form.getValues("coverImage") || null);
+            setImagePreview(
+              blog?.coverImage || form.getValues("coverImage") || null,
+            );
             // Reset previous fileKey on cancel
             setPreviousFileKey(null);
           }}
@@ -801,4 +807,3 @@ export function BlogForm({ blog }: BlogFormProps) {
     </div>
   );
 }
-

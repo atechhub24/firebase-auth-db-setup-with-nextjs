@@ -107,7 +107,9 @@ export default function StaffsPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium">Total Staffs</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">
+              Total Staffs
+            </CardTitle>
             <Building2 className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -118,7 +120,9 @@ export default function StaffsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium">Active</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">
+              Active
+            </CardTitle>
             <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
           </CardHeader>
           <CardContent>
@@ -131,7 +135,9 @@ export default function StaffsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium">Pending</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">
+              Pending
+            </CardTitle>
             <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
@@ -144,7 +150,9 @@ export default function StaffsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium">Inactive</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">
+              Inactive
+            </CardTitle>
             <Users className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
           </CardHeader>
           <CardContent>

@@ -51,12 +51,12 @@ function validateEnv() {
   } catch (error) {
     if (error instanceof z.ZodError) {
       const missingVars = error.issues.map(
-        (err) => `${err.path.join(".")}: ${err.message}`
+        (err) => `${err.path.join(".")}: ${err.message}`,
       );
       throw new Error(
         "Invalid environment variables:\n" +
           missingVars.join("\n") +
-          "\n\nPlease check your .env.local file."
+          "\n\nPlease check your .env.local file.",
       );
     }
     throw error;

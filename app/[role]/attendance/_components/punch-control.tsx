@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useState, useCallback, forwardRef, useImperativeHandle } from "react";
+import {
+  useEffect,
+  useState,
+  useCallback,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import { Clock, MapPin, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -53,8 +59,8 @@ export const PunchControl = forwardRef<PunchControlRef>((_, ref) => {
         result.state === "granted"
           ? "granted"
           : result.state === "denied"
-          ? "denied"
-          : "prompt"
+            ? "denied"
+            : "prompt",
       );
 
       result.onchange = () => {
@@ -62,8 +68,8 @@ export const PunchControl = forwardRef<PunchControlRef>((_, ref) => {
           result.state === "granted"
             ? "granted"
             : result.state === "denied"
-            ? "denied"
-            : "prompt"
+              ? "denied"
+              : "prompt",
         );
       };
     } catch {
@@ -127,7 +133,7 @@ export const PunchControl = forwardRef<PunchControlRef>((_, ref) => {
         });
       } else {
         console.warn(
-          "Record not found after punch in - this might indicate a save issue"
+          "Record not found after punch in - this might indicate a save issue",
         );
       }
 

@@ -28,14 +28,14 @@ export function BlogCard({ blog }: BlogCardProps) {
             <div className="relative h-56 w-full overflow-hidden">
               {/* Gradient Overlay on Hover */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out z-10" />
-              
+
               {/* Image with Scale on Hover */}
               <img
                 src={blog.coverImage}
                 alt={blog.title}
                 className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
               />
-              
+
               {/* Featured Badge with Entrance Animation */}
               {blog.featured && (
                 <motion.div

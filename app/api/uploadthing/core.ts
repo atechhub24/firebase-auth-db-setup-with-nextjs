@@ -3,7 +3,7 @@ import { createUploadthing, type FileRouter } from "uploadthing/next";
 // Validate UploadThing token is present (server-side only)
 if (!process.env.UPLOADTHING_TOKEN) {
   throw new Error(
-    "UPLOADTHING_TOKEN is required. Please add it to your .env.local file."
+    "UPLOADTHING_TOKEN is required. Please add it to your .env.local file.",
   );
 }
 
@@ -22,8 +22,15 @@ export const ourFileRouter = {
       return {};
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log("Upload complete:", file.url, "Key:", file.key, "Name:", file.name);
-      return { 
+      console.log(
+        "Upload complete:",
+        file.url,
+        "Key:",
+        file.key,
+        "Name:",
+        file.name,
+      );
+      return {
         url: file.url,
         key: file.key,
         name: file.name,
@@ -82,4 +89,3 @@ export const ourFileRouter = {
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;
-

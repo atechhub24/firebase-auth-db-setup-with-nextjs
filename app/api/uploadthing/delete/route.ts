@@ -13,7 +13,7 @@ export async function DELETE(request: Request) {
     if (!process.env.UPLOADTHING_TOKEN) {
       return Response.json(
         { error: "UploadThing token not configured" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 

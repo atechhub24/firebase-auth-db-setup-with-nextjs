@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useState, forwardRef, useImperativeHandle } from "react";
-import { Clock, Calendar, Loader2, CheckCircle2, XCircle, TrendingUp } from "lucide-react";
+import {
+  Clock,
+  Calendar,
+  Loader2,
+  CheckCircle2,
+  XCircle,
+  TrendingUp,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -169,17 +176,13 @@ export const AttendanceStats = forwardRef<AttendanceStatsRef>((_, ref) => {
               </div>
               <div
                 className={`flex items-center justify-between p-3 rounded-lg border ${
-                  isCompleted
-                    ? "bg-card"
-                    : "bg-muted/30 border-dashed"
+                  isCompleted ? "bg-card" : "bg-muted/30 border-dashed"
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <div
                     className={`size-10 rounded-lg flex items-center justify-center ${
-                      isCompleted
-                        ? "bg-red-100 dark:bg-red-900/30"
-                        : "bg-muted"
+                      isCompleted ? "bg-red-100 dark:bg-red-900/30" : "bg-muted"
                     }`}
                   >
                     <Clock
@@ -251,4 +254,3 @@ export const AttendanceStats = forwardRef<AttendanceStatsRef>((_, ref) => {
 });
 
 AttendanceStats.displayName = "AttendanceStats";
-

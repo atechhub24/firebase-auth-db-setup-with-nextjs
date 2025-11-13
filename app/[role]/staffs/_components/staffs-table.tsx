@@ -71,7 +71,7 @@ export function StaffsTable({ staffs, onRefresh }: StaffsTableProps) {
   const filteredStaffs = staffs.filter(
     (staff) =>
       staff.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      staff.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      staff.email?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const openDeleteDialog = (staff: User) => {
@@ -162,7 +162,9 @@ export function StaffsTable({ staffs, onRefresh }: StaffsTableProps) {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold tracking-tight">Staffs</h2>
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight">
+            Staffs
+          </h2>
           <p className="text-sm sm:text-base text-muted-foreground">
             Manage staff accounts and their access to the platform.
           </p>
@@ -249,14 +251,16 @@ export function StaffsTable({ staffs, onRefresh }: StaffsTableProps) {
           {filteredStaffs.length === 0 ? (
             <div className="text-center py-8">
               <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-base sm:text-lg font-semibold mb-2">No staffs found</h3>
+              <h3 className="text-base sm:text-lg font-semibold mb-2">
+                No staffs found
+              </h3>
               <p className="text-sm text-muted-foreground mb-4">
                 {searchTerm
                   ? "Try adjusting your search terms."
                   : "Get started by adding your first staff."}
               </p>
               {!searchTerm && (
-                <Button 
+                <Button
                   onClick={() => router.push(`/${role}/staffs/create`)}
                   size="sm"
                 >
@@ -340,7 +344,7 @@ export function StaffsTable({ staffs, onRefresh }: StaffsTableProps) {
                               <DropdownMenuItem
                                 onClick={() =>
                                   router.push(
-                                    `/${role}/staffs/${staff.id}/password`
+                                    `/${role}/staffs/${staff.id}/password`,
                                   )
                                 }
                               >
@@ -379,7 +383,9 @@ export function StaffsTable({ staffs, onRefresh }: StaffsTableProps) {
                         />
                         <div className="flex-1 min-w-0 space-y-2">
                           <div>
-                            <div className="font-medium text-sm truncate">{staff.name}</div>
+                            <div className="font-medium text-sm truncate">
+                              {staff.name}
+                            </div>
                             <div className="text-xs text-muted-foreground truncate">
                               ID: {staff.id}
                             </div>
@@ -399,7 +405,10 @@ export function StaffsTable({ staffs, onRefresh }: StaffsTableProps) {
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0 flex-shrink-0">
+                          <Button
+                            variant="ghost"
+                            className="h-8 w-8 p-0 flex-shrink-0"
+                          >
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -414,7 +423,7 @@ export function StaffsTable({ staffs, onRefresh }: StaffsTableProps) {
                           <DropdownMenuItem
                             onClick={() =>
                               router.push(
-                                `/${role}/staffs/${staff.id}/password`
+                                `/${role}/staffs/${staff.id}/password`,
                               )
                             }
                           >

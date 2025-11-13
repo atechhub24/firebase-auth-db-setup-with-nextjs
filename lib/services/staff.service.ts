@@ -80,7 +80,7 @@ class StaffService {
   async delete(
     id: string,
     email: string,
-    currentPassword: string
+    currentPassword: string,
   ): Promise<void> {
     // Step 1: Delete Firebase Auth user
     await deleteUser(email, currentPassword);
@@ -115,7 +115,7 @@ class StaffService {
   async changePassword(
     id: string,
     currentPassword: string,
-    newPassword: string
+    newPassword: string,
   ): Promise<void> {
     const staff = await this.getById(id);
     if (!staff) {

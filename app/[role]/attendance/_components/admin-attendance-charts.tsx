@@ -1,10 +1,33 @@
 "use client";
 
-import { useEffect, useState, useCallback, forwardRef, useImperativeHandle } from "react";
+import {
+  useEffect,
+  useState,
+  useCallback,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import { format, parse, eachDayOfInterval, subDays } from "date-fns";
 import { Loader2 } from "lucide-react";
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Label, Pie, PieChart, XAxis, YAxis } from "recharts";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Label,
+  Pie,
+  PieChart,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -78,7 +101,9 @@ export const AdminAttendanceCharts = forwardRef<
     ];
 
     // 2. Daily attendance trends (last 14 days)
-    const endDate = dateStr ? parse(dateStr, "yyyy-MM-dd", new Date()) : new Date();
+    const endDate = dateStr
+      ? parse(dateStr, "yyyy-MM-dd", new Date())
+      : new Date();
     const startDate = subDays(endDate, 14);
     const days = eachDayOfInterval({ start: startDate, end: endDate });
 
@@ -87,7 +112,10 @@ export const AdminAttendanceCharts = forwardRef<
       const dayRecords = records.filter((r) => r.date === dayStr);
       const present = dayRecords.filter((r) => r.status === "present").length;
       const absent = dayRecords.filter((r) => r.status === "absent").length;
-      const totalHours = dayRecords.reduce((sum, r) => sum + (r.totalHours || 0), 0);
+      const totalHours = dayRecords.reduce(
+        (sum, r) => sum + (r.totalHours || 0),
+        0,
+      );
 
       return {
         date: dayStr,
@@ -102,7 +130,10 @@ export const AdminAttendanceCharts = forwardRef<
     const staffHoursMap = new Map<string, { name: string; hours: number }>();
     records.forEach((r) => {
       if (r.totalHours) {
-        const existing = staffHoursMap.get(r.staffId) || { name: r.staffName, hours: 0 };
+        const existing = staffHoursMap.get(r.staffId) || {
+          name: r.staffName,
+          hours: 0,
+        };
         staffHoursMap.set(r.staffId, {
           name: existing.name,
           hours: existing.hours + (r.totalHours || 0),
@@ -112,7 +143,10 @@ export const AdminAttendanceCharts = forwardRef<
 
     const staffPerformanceData = Array.from(staffHoursMap.values())
       .map((staff) => ({
-        name: staff.name.length > 15 ? staff.name.substring(0, 15) + "..." : staff.name,
+        name:
+          staff.name.length > 15
+            ? staff.name.substring(0, 15) + "..."
+            : staff.name,
         hours: Math.round(staff.hours * 100) / 100,
       }))
       .sort((a, b) => b.hours - a.hours)
@@ -215,7 +249,10 @@ export const AdminAttendanceCharts = forwardRef<
                 <Label
                   content={({ viewBox }) => {
                     if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                      const total = chartData.statusData.reduce((sum, item) => sum + item.count, 0);
+                      const total = chartData.statusData.reduce(
+                        (sum, item) => sum + item.count,
+                        0,
+                      );
                       return (
                         <text
                           x={viewBox.cx}
@@ -436,7 +473,9 @@ export const AdminAttendanceCharts = forwardRef<
         <Card>
           <CardHeader>
             <CardTitle>Hours Worked</CardTitle>
-            <CardDescription>Total hours per day (last 14 days)</CardDescription>
+            <CardDescription>
+              Total hours per day (last 14 days)
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer
@@ -476,4 +515,3 @@ export const AdminAttendanceCharts = forwardRef<
 });
 
 AdminAttendanceCharts.displayName = "AdminAttendanceCharts";
-

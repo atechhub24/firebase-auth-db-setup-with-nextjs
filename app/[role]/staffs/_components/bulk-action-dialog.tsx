@@ -40,13 +40,13 @@ export function BulkActionDialog({
       const promises = selectedIds.map((id) =>
         staffService.update(id, {
           status: bulkAction as "active" | "inactive" | "pending",
-        })
+        }),
       );
 
       await Promise.all(promises);
 
       toast.success(
-        `Successfully updated ${selectedIds.length} staffs to ${bulkAction}`
+        `Successfully updated ${selectedIds.length} staffs to ${bulkAction}`,
       );
       onSuccess();
       onOpenChange(false);

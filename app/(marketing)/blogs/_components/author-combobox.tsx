@@ -68,7 +68,7 @@ export function AuthorCombobox({
                 <Check
                   className={cn(
                     "mr-2 h-4 w-4",
-                    selectedAuthor === "all" ? "opacity-100" : "opacity-0"
+                    selectedAuthor === "all" ? "opacity-100" : "opacity-0",
                   )}
                 />
                 <User className="mr-2 h-4 w-4" />
@@ -86,7 +86,7 @@ export function AuthorCombobox({
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      selectedAuthor === author ? "opacity-100" : "opacity-0"
+                      selectedAuthor === author ? "opacity-100" : "opacity-0",
                     )}
                   />
                   <span className="font-medium">{author}</span>
@@ -99,4 +99,3 @@ export function AuthorCombobox({
     </Popover>
   );
 }
-

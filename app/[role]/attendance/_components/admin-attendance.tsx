@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useState, useCallback, forwardRef, useImperativeHandle } from "react";
+import {
+  useEffect,
+  useState,
+  useCallback,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import { Loader2 } from "lucide-react";
 import { motion } from "motion/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -74,12 +80,16 @@ export const AdminAttendance = forwardRef<
     loadRecords();
   }, [loadRecords]);
 
-  useImperativeHandle(ref, () => ({
-    refetch: () => {
-      loadStaffs();
-      loadRecords();
-    },
-  }), [loadStaffs, loadRecords]);
+  useImperativeHandle(
+    ref,
+    () => ({
+      refetch: () => {
+        loadStaffs();
+        loadRecords();
+      },
+    }),
+    [loadStaffs, loadRecords],
+  );
 
   const getStaffInfo = (staffId: string) => {
     return staffs.find((staff) => staff.uid === staffId);

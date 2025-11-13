@@ -72,9 +72,7 @@ export default function EditBlogPage() {
             <h2 className="text-xl font-semibold text-red-600">Error</h2>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground">
-              {error || "Blog not found"}
-            </p>
+            <p className="text-muted-foreground">{error || "Blog not found"}</p>
           </CardContent>
         </Card>
       </div>
@@ -83,4 +81,3 @@ export default function EditBlogPage() {
 
   return <BlogForm blog={blog} />;
 }
-

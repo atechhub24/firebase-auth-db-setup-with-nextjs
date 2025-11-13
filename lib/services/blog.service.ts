@@ -163,7 +163,8 @@ class BlogService {
     if (data.content !== undefined) updateData.content = data.content;
     if (data.excerpt !== undefined) updateData.excerpt = data.excerpt;
     if (data.coverImage !== undefined) updateData.coverImage = data.coverImage;
-    if (data.coverImageFileKey !== undefined) updateData.coverImageFileKey = data.coverImageFileKey;
+    if (data.coverImageFileKey !== undefined)
+      updateData.coverImageFileKey = data.coverImageFileKey;
     if (data.author !== undefined) updateData.author = data.author;
     if (data.category !== undefined) updateData.category = data.category;
     if (data.tags !== undefined) updateData.tags = data.tags;
@@ -205,7 +206,7 @@ class BlogService {
   async getByTag(tag: string): Promise<Blog[]> {
     const blogs = await this.getAll();
     return blogs.filter((blog) =>
-      blog.tags?.some((t) => t.toLowerCase() === tag.toLowerCase())
+      blog.tags?.some((t) => t.toLowerCase() === tag.toLowerCase()),
     );
   }
 

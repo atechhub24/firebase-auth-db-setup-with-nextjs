@@ -12,7 +12,7 @@ import { toast } from "sonner";
 
 export function AdminAttendanceCalendar() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    new Date()
+    new Date(),
   );
   const [records, setRecords] = useState<Attendance[]>([]);
   const [loading, setLoading] = useState(false);
@@ -85,9 +85,7 @@ export function AdminAttendanceCalendar() {
                       {record.punchOutTime && (
                         <> | Punch Out: {formatTime(record.punchOutTime)}</>
                       )}
-                      {record.totalHours && (
-                        <> | Hours: {record.totalHours}h</>
-                      )}
+                      {record.totalHours && <> | Hours: {record.totalHours}h</>}
                     </div>
                   </div>
                 ))}
@@ -99,4 +97,3 @@ export function AdminAttendanceCalendar() {
     </Card>
   );
 }
-

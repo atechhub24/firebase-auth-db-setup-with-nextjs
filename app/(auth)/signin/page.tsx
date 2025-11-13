@@ -21,7 +21,7 @@ export default function SignInPage() {
           error.message.includes("invalid-credential")
         ) {
           throw new Error(
-            "Invalid email or password. Please check your credentials."
+            "Invalid email or password. Please check your credentials.",
           );
         }
         if (error.message.includes("too-many-requests")) {
@@ -29,7 +29,7 @@ export default function SignInPage() {
         }
         if (error.message.includes("user-disabled")) {
           throw new Error(
-            "This account has been disabled. Please contact support."
+            "This account has been disabled. Please contact support.",
           );
         }
         // Re-throw the original error if it has a user-friendly message

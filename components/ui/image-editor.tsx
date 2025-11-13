@@ -74,14 +74,14 @@ export function ImageEditor({
           },
           aspectRatio,
           naturalWidth,
-          naturalHeight
+          naturalHeight,
         ),
         naturalWidth,
-        naturalHeight
+        naturalHeight,
       );
       setCrop(crop);
     },
-    [aspectRatio]
+    [aspectRatio],
   );
 
   // Draw cropped image to canvas
@@ -89,7 +89,7 @@ export function ImageEditor({
     async (
       image: HTMLImageElement,
       crop: PixelCrop,
-      rotation: number
+      rotation: number,
     ): Promise<File | null> => {
       if (!crop.width || !crop.height) return null;
 
@@ -130,7 +130,7 @@ export function ImageEditor({
         0,
         0,
         image.naturalWidth,
-        image.naturalHeight
+        image.naturalHeight,
       );
       ctx.restore();
 
@@ -149,11 +149,11 @@ export function ImageEditor({
             resolve(file);
           },
           "image/webp",
-          0.95
+          0.95,
         );
       });
     },
-    [imageFile.name]
+    [imageFile.name],
   );
 
   const handleSave = async () => {
@@ -165,7 +165,7 @@ export function ImageEditor({
       const croppedFile = await drawCroppedImage(
         imgRef.current,
         completedCrop,
-        rotation
+        rotation,
       );
 
       if (!croppedFile) {

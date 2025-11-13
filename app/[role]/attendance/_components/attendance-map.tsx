@@ -10,8 +10,11 @@ import type { Attendance } from "@/lib/types/attendance.type";
 import { toast } from "sonner";
 
 const AttendanceMapClient = dynamic(
-  () => import("./attendance-map-client").then((mod) => ({ default: mod.AttendanceMapClient })),
-  { ssr: false }
+  () =>
+    import("./attendance-map-client").then((mod) => ({
+      default: mod.AttendanceMapClient,
+    })),
+  { ssr: false },
 );
 
 export interface AttendanceMapRef {
@@ -96,4 +99,3 @@ export const AttendanceMap = forwardRef<AttendanceMapRef>((_, ref) => {
 });
 
 AttendanceMap.displayName = "AttendanceMap";
-

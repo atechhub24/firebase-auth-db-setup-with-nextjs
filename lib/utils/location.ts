@@ -23,7 +23,7 @@ export function getCurrentLocation(): Promise<AttendanceLocation> {
               headers: {
                 "User-Agent": "GenexLifeCare/1.0", // Required by Nominatim ToS
               },
-            }
+            },
           );
 
           if (!response.ok) {
@@ -68,8 +68,7 @@ export function getCurrentLocation(): Promise<AttendanceLocation> {
         enableHighAccuracy: true,
         timeout: 10000,
         maximumAge: 0,
-      }
+      },
     );
   });
 }
-

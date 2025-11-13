@@ -91,7 +91,10 @@ export function StaffSelector({
           <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+      <PopoverContent
+        className="w-[var(--radix-popover-trigger-width)] p-0"
+        align="start"
+      >
         <Command>
           <CommandInput placeholder="Search staff..." />
           <CommandList>
@@ -111,7 +114,7 @@ export function StaffSelector({
                 <Check
                   className={cn(
                     "ml-auto size-4 shrink-0",
-                    selectedStaffId === "all" ? "opacity-100" : "opacity-0"
+                    selectedStaffId === "all" ? "opacity-100" : "opacity-0",
                   )}
                 />
               </CommandItem>
@@ -148,7 +151,7 @@ export function StaffSelector({
                       "ml-auto size-4 shrink-0",
                       selectedStaffId === staff.uid
                         ? "opacity-100"
-                        : "opacity-0"
+                        : "opacity-0",
                     )}
                   />
                 </CommandItem>
@@ -160,4 +163,3 @@ export function StaffSelector({
     </Popover>
   );
 }
-

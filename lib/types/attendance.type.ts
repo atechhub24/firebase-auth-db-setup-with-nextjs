@@ -43,4 +43,3 @@ export interface AdminAnalytics {
   averageHoursPerStaff: number;
   totalHours: number;
 }
-

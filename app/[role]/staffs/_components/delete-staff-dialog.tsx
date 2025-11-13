@@ -49,7 +49,7 @@ export function DeleteStaffDialog({
     } catch (error) {
       console.error("Error deleting staff:", error);
       toast.error(
-        "Failed to delete staff. Please check the password and try again."
+        "Failed to delete staff. Please check the password and try again.",
       );
     } finally {
       setIsDeleting(false);

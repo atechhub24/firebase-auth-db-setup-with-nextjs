@@ -46,7 +46,7 @@ export function RichTextRenderer({
       attributes: {
         class: cn(
           "prose prose-sm sm:prose-base lg:prose-lg dark:prose-invert max-w-none",
-          className
+          className,
         ),
       },
     },
@@ -58,4 +58,3 @@ export function RichTextRenderer({
 
   return <EditorContent editor={editor} />;
 }
-

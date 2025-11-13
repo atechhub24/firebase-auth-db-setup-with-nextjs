@@ -21,7 +21,7 @@ export const breadcrumbLabelMap: Record<string, string> = {
  */
 export function getSegmentLabel(
   segment: string,
-  previousSegment?: string
+  previousSegment?: string,
 ): string {
   // Check if it's a mapped label
   if (breadcrumbLabelMap[segment]) {
@@ -31,7 +31,7 @@ export function getSegmentLabel(
   // Check if it's a dynamic ID (UUID, Firebase UID, or number)
   const isUUID =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-      segment
+      segment,
     );
   const isNumber = /^\d+$/.test(segment);
   const isFirebaseUID = /^[a-zA-Z0-9]{20,}$/.test(segment); // Firebase UIDs are typically 28 chars, alphanumeric

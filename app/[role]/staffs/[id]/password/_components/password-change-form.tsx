@@ -100,7 +100,7 @@ export function PasswordChangeForm({ staffId }: PasswordChangeFormProps) {
       await staffService.changePassword(
         id,
         data.currentPassword,
-        data.newPassword
+        data.newPassword,
       );
 
       // Show success alert with transition
@@ -114,7 +114,7 @@ export function PasswordChangeForm({ staffId }: PasswordChangeFormProps) {
     } catch (error) {
       console.error("Error changing password:", error);
       toast.error(
-        "Failed to change password. Please check your current password and try again."
+        "Failed to change password. Please check your current password and try again.",
       );
     } finally {
       setIsLoading(false);

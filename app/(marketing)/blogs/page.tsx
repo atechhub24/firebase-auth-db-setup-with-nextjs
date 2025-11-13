@@ -26,32 +26,29 @@ export default function BlogsPage() {
 
   const [searchTerm, setSearchTerm] = useQueryState(
     "search",
-    parseAsString.withDefault("")
+    parseAsString.withDefault(""),
   );
   const [selectedCategories] = useQueryState(
     "categories",
-    parseAsArrayOf(parseAsString).withDefault([])
+    parseAsArrayOf(parseAsString).withDefault([]),
   );
   const [selectedTags] = useQueryState(
     "tags",
-    parseAsArrayOf(parseAsString).withDefault([])
+    parseAsArrayOf(parseAsString).withDefault([]),
   );
   const [selectedAuthor] = useQueryState(
     "author",
-    parseAsString.withDefault("all")
+    parseAsString.withDefault("all"),
   );
   const [showFeaturedOnly] = useQueryState(
     "featured",
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false),
   );
   const [sortOption] = useQueryState(
     "sort",
-    parseAsString.withDefault("new-first")
+    parseAsString.withDefault("new-first"),
   );
-  const [viewMode] = useQueryState(
-    "view",
-    parseAsString.withDefault("grid")
-  );
+  const [viewMode] = useQueryState("view", parseAsString.withDefault("grid"));
 
   const fetchBlogs = async () => {
     try {
@@ -81,7 +78,7 @@ export default function BlogsPage() {
         blog.excerpt?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         blog.author?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         blog.tags?.some((tag) =>
-          tag.toLowerCase().includes(searchTerm.toLowerCase())
+          tag.toLowerCase().includes(searchTerm.toLowerCase()),
         );
 
       // Category filter
@@ -113,12 +110,28 @@ export default function BlogsPage() {
     // Sort blogs
     filtered = [...filtered].sort((a, b) => {
       if (sortOption === "new-first") {
-        const aTime = a.publishedAt || (typeof a.createdAt === "string" ? new Date(a.createdAt).getTime() : 0);
-        const bTime = b.publishedAt || (typeof b.createdAt === "string" ? new Date(b.createdAt).getTime() : 0);
+        const aTime =
+          a.publishedAt ||
+          (typeof a.createdAt === "string"
+            ? new Date(a.createdAt).getTime()
+            : 0);
+        const bTime =
+          b.publishedAt ||
+          (typeof b.createdAt === "string"
+            ? new Date(b.createdAt).getTime()
+            : 0);
         return bTime - aTime;
       } else if (sortOption === "old-first") {
-        const aTime = a.publishedAt || (typeof a.createdAt === "string" ? new Date(a.createdAt).getTime() : 0);
-        const bTime = b.publishedAt || (typeof b.createdAt === "string" ? new Date(b.createdAt).getTime() : 0);
+        const aTime =
+          a.publishedAt ||
+          (typeof a.createdAt === "string"
+            ? new Date(a.createdAt).getTime()
+            : 0);
+        const bTime =
+          b.publishedAt ||
+          (typeof b.createdAt === "string"
+            ? new Date(b.createdAt).getTime()
+            : 0);
         return aTime - bTime;
       } else if (sortOption === "a-z") {
         return a.title.localeCompare(b.title);

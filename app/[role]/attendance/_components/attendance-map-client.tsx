@@ -82,7 +82,7 @@ export function AttendanceMapClient({
 
         const marker = L.marker(
           [record.punchInLocation.lat, record.punchInLocation.lng],
-          { icon: punchInIcon }
+          { icon: punchInIcon },
         )
           .addTo(mapRef.current!)
           .bindPopup(popupContent);
@@ -112,16 +112,13 @@ export function AttendanceMapClient({
 
         const marker = L.marker(
           [record.punchOutLocation.lat, record.punchOutLocation.lng],
-          { icon: punchOutIcon }
+          { icon: punchOutIcon },
         )
           .addTo(mapRef.current!)
           .bindPopup(popupContent);
 
         markersRef.current.push(marker);
-        bounds.push([
-          record.punchOutLocation.lat,
-          record.punchOutLocation.lng,
-        ]);
+        bounds.push([record.punchOutLocation.lat, record.punchOutLocation.lng]);
       }
     });
 
@@ -139,4 +136,3 @@ export function AttendanceMapClient({
     />
   );
 }
-

@@ -77,7 +77,7 @@ export function ProfileSettings() {
         `/api/uploadthing/delete?fileKey=${encodeURIComponent(fileKey)}`,
         {
           method: "DELETE",
-        }
+        },
       );
 
       if (!response.ok) {
@@ -217,7 +217,7 @@ export function ProfileSettings() {
       : "0";
 
     toast.success(
-      `Image optimized: ${originalSize} → ${optimizedSize} (${compressionRatio}% reduction)`
+      `Image optimized: ${originalSize} → ${optimizedSize} (${compressionRatio}% reduction)`,
     );
 
     // Delete old file BEFORE uploading new one (if fileKey exists)

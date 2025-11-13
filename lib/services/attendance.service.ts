@@ -74,7 +74,7 @@ class AttendanceService {
    */
   async punchOut(
     recordId: string,
-    location: AttendanceLocation
+    location: AttendanceLocation,
   ): Promise<void> {
     const record = await this.getById(recordId);
     if (!record) {
@@ -85,7 +85,7 @@ class AttendanceService {
     const nowISO = new Date().toISOString();
     const totalHours =
       Math.round(
-        ((punchOutTime - record.punchInTime) / (1000 * 60 * 60)) * 100
+        ((punchOutTime - record.punchInTime) / (1000 * 60 * 60)) * 100,
       ) / 100;
 
     await mutate({
@@ -132,7 +132,7 @@ class AttendanceService {
   async getByStaffId(
     staffId: string,
     startDate?: string,
-    endDate?: string
+    endDate?: string,
   ): Promise<Attendance[]> {
     const data = await mutate({
       action: "get",
@@ -207,7 +207,7 @@ class AttendanceService {
    */
   async getStaffAnalytics(
     staffId: string,
-    period: "week" | "month"
+    period: "week" | "month",
   ): Promise<AttendanceAnalytics> {
     const now = new Date();
     const startDate = new Date();
@@ -221,15 +221,15 @@ class AttendanceService {
     const records = await this.getByStaffId(staffId, startDateStr);
 
     const completedRecords = records.filter(
-      (record) => record.punchOutTime && record.totalHours
+      (record) => record.punchOutTime && record.totalHours,
     );
     const totalHours = completedRecords.reduce(
       (sum, record) => sum + (record.totalHours || 0),
-      0
+      0,
     );
     const presentDays = new Set(records.map((r) => r.date)).size;
     const totalDays = Math.ceil(
-      (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+      (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
     );
     const absentDays = totalDays - presentDays;
     const averageHoursPerDay =
@@ -263,15 +263,15 @@ class AttendanceService {
     const todayRecords = records.filter((record) => record.date === today);
     const uniqueStaffIds = new Set(records.map((r) => r.staffId));
     const presentStaffIds = new Set(
-      todayRecords.filter((r) => r.status === "present").map((r) => r.staffId)
+      todayRecords.filter((r) => r.status === "present").map((r) => r.staffId),
     );
 
     const completedRecords = records.filter(
-      (record) => record.punchOutTime && record.totalHours
+      (record) => record.punchOutTime && record.totalHours,
     );
     const totalHours = completedRecords.reduce(
       (sum, record) => sum + (record.totalHours || 0),
-      0
+      0,
     );
 
     const averageHoursPerStaff =

@@ -81,7 +81,9 @@ export default function BlogDetailPage() {
               <h2 className="text-xl font-semibold text-red-600">Error</h2>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">{error || "Blog not found"}</p>
+              <p className="text-muted-foreground">
+                {error || "Blog not found"}
+              </p>
               <Link href="/blogs">
                 <Button variant="outline" className="mt-4">
                   <ArrowLeft className="h-4 w-4 mr-2" />

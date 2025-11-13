@@ -16,11 +16,11 @@ import { cn } from "@/lib/utils";
 export function BlogSortControls() {
   const [sortOption, setSortOption] = useQueryState(
     "sort",
-    parseAsString.withDefault("new-first")
+    parseAsString.withDefault("new-first"),
   );
   const [viewMode, setViewMode] = useQueryState(
     "view",
-    parseAsString.withDefault("grid")
+    parseAsString.withDefault("grid"),
   );
 
   return (
@@ -44,7 +44,7 @@ export function BlogSortControls() {
             "relative px-2 py-1 rounded-sm text-xs font-medium transition-all duration-300",
             viewMode === "grid"
               ? "text-primary-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
+              : "text-muted-foreground hover:text-foreground",
           )}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -67,7 +67,7 @@ export function BlogSortControls() {
             "relative px-2 py-1 rounded-sm text-xs font-medium transition-all duration-300",
             viewMode === "list"
               ? "text-primary-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
+              : "text-muted-foreground hover:text-foreground",
           )}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}

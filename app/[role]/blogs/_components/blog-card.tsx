@@ -42,12 +42,30 @@ export const cardVariants = {
 
 const getCategoryColors = (category: string) => {
   const colors: Record<string, { bg: string; text: string }> = {
-    health: { bg: "bg-red-100 dark:bg-red-900", text: "text-red-800 dark:text-red-200" },
-    news: { bg: "bg-blue-100 dark:bg-blue-900", text: "text-blue-800 dark:text-blue-200" },
-    tips: { bg: "bg-yellow-100 dark:bg-yellow-900", text: "text-yellow-800 dark:text-yellow-200" },
-    wellness: { bg: "bg-purple-100 dark:bg-purple-900", text: "text-purple-800 dark:text-purple-200" },
-    research: { bg: "bg-indigo-100 dark:bg-indigo-900", text: "text-indigo-800 dark:text-indigo-200" },
-    general: { bg: "bg-gray-100 dark:bg-gray-900", text: "text-gray-800 dark:text-gray-200" },
+    health: {
+      bg: "bg-red-100 dark:bg-red-900",
+      text: "text-red-800 dark:text-red-200",
+    },
+    news: {
+      bg: "bg-blue-100 dark:bg-blue-900",
+      text: "text-blue-800 dark:text-blue-200",
+    },
+    tips: {
+      bg: "bg-yellow-100 dark:bg-yellow-900",
+      text: "text-yellow-800 dark:text-yellow-200",
+    },
+    wellness: {
+      bg: "bg-purple-100 dark:bg-purple-900",
+      text: "text-purple-800 dark:text-purple-200",
+    },
+    research: {
+      bg: "bg-indigo-100 dark:bg-indigo-900",
+      text: "text-indigo-800 dark:text-indigo-200",
+    },
+    general: {
+      bg: "bg-gray-100 dark:bg-gray-900",
+      text: "text-gray-800 dark:text-gray-200",
+    },
   };
   return colors[category] || colors.general;
 };
@@ -179,4 +197,3 @@ export function BlogCard({ blog, onDelete }: BlogCardProps) {
     </motion.div>
   );
 }
-

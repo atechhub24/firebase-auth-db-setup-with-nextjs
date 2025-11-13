@@ -17,7 +17,7 @@ export function generateSlug(title: string): string {
  */
 export function generateExcerpt(
   content: Record<string, unknown>,
-  maxLength: number = 150
+  maxLength: number = 150,
 ): string {
   try {
     if (!content || typeof content !== "object") {
@@ -77,7 +77,7 @@ export function formatBlogDate(timestamp: number | string): string {
 export function getRelatedBlogs(
   blog: Blog,
   allBlogs: Blog[],
-  limit: number = 3
+  limit: number = 3,
 ): Blog[] {
   const related = allBlogs
     .filter((b) => {
@@ -130,4 +130,3 @@ export function getAllTags(blogs: Blog[]): string[] {
   });
   return Array.from(tags).sort();
 }
-

@@ -37,7 +37,7 @@ export function TagsMultiSelect({
   const filteredTags = useMemo(() => {
     if (!searchTerm) return tags;
     return tags.filter((tag) =>
-      tag.toLowerCase().includes(searchTerm.toLowerCase())
+      tag.toLowerCase().includes(searchTerm.toLowerCase()),
     );
   }, [tags, searchTerm]);
 
@@ -143,7 +143,7 @@ export function TagsMultiSelect({
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          isSelected ? "opacity-100" : "opacity-0"
+                          isSelected ? "opacity-100" : "opacity-0",
                         )}
                       />
                       <Tag className="mr-2 h-4 w-4 shrink-0" />
@@ -167,4 +167,3 @@ export function TagsMultiSelect({
     </div>
   );
 }
-

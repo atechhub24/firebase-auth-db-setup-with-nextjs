@@ -55,4 +55,3 @@ export const slideInFromRight: Variants = {
     transition: { duration: 0.5, ease: "easeOut" },
   },
 };
-

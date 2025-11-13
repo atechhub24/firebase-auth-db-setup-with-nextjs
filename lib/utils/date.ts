@@ -6,7 +6,7 @@ import { format, isValid } from "date-fns";
  */
 export function formatDate(
   timestamp: number | string | undefined | null,
-  formatStr: string = "PP"
+  formatStr: string = "PP",
 ): string {
   if (!timestamp) return "-";
 
@@ -37,7 +37,7 @@ export function formatDate(
  * Safely format a timestamp to a time string
  */
 export function formatTime(
-  timestamp: number | string | undefined | null
+  timestamp: number | string | undefined | null,
 ): string {
   return formatDate(timestamp, "p");
 }
@@ -46,7 +46,7 @@ export function formatTime(
  * Safely format a timestamp to a date and time string
  */
 export function formatDateTime(
-  timestamp: number | string | undefined | null
+  timestamp: number | string | undefined | null,
 ): string {
   return formatDate(timestamp, "PPp");
 }

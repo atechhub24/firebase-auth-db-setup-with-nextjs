@@ -113,7 +113,7 @@ export function RichTextEditor({
     <div
       className={cn(
         "border-input rounded-md border bg-background shadow-xs",
-        className
+        className,
       )}
     >
       {/* Toolbar */}
@@ -125,7 +125,7 @@ export function RichTextEditor({
           onClick={() => editor.chain().focus().toggleBold().run()}
           disabled={!editor.can().chain().focus().toggleBold().run()}
           className={cn(
-            editor.isActive("bold") && "bg-accent text-accent-foreground"
+            editor.isActive("bold") && "bg-accent text-accent-foreground",
           )}
           aria-label="Bold"
         >
@@ -139,7 +139,7 @@ export function RichTextEditor({
           onClick={() => editor.chain().focus().toggleItalic().run()}
           disabled={!editor.can().chain().focus().toggleItalic().run()}
           className={cn(
-            editor.isActive("italic") && "bg-accent text-accent-foreground"
+            editor.isActive("italic") && "bg-accent text-accent-foreground",
           )}
           aria-label="Italic"
         >
@@ -157,7 +157,7 @@ export function RichTextEditor({
           }
           className={cn(
             editor.isActive("heading", { level: 1 }) &&
-              "bg-accent text-accent-foreground"
+              "bg-accent text-accent-foreground",
           )}
           aria-label="Heading 1"
         >
@@ -173,7 +173,7 @@ export function RichTextEditor({
           }
           className={cn(
             editor.isActive("heading", { level: 2 }) &&
-              "bg-accent text-accent-foreground"
+              "bg-accent text-accent-foreground",
           )}
           aria-label="Heading 2"
         >
@@ -189,7 +189,7 @@ export function RichTextEditor({
           }
           className={cn(
             editor.isActive("heading", { level: 3 }) &&
-              "bg-accent text-accent-foreground"
+              "bg-accent text-accent-foreground",
           )}
           aria-label="Heading 3"
         >
@@ -204,8 +204,7 @@ export function RichTextEditor({
           size="icon-sm"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={cn(
-            editor.isActive("bulletList") &&
-              "bg-accent text-accent-foreground"
+            editor.isActive("bulletList") && "bg-accent text-accent-foreground",
           )}
           aria-label="Bullet List"
         >
@@ -219,7 +218,7 @@ export function RichTextEditor({
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           className={cn(
             editor.isActive("orderedList") &&
-              "bg-accent text-accent-foreground"
+              "bg-accent text-accent-foreground",
           )}
           aria-label="Ordered List"
         >
@@ -232,8 +231,7 @@ export function RichTextEditor({
           size="icon-sm"
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
           className={cn(
-            editor.isActive("blockquote") &&
-              "bg-accent text-accent-foreground"
+            editor.isActive("blockquote") && "bg-accent text-accent-foreground",
           )}
           aria-label="Blockquote"
         >
@@ -246,8 +244,7 @@ export function RichTextEditor({
           size="icon-sm"
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
           className={cn(
-            editor.isActive("codeBlock") &&
-              "bg-accent text-accent-foreground"
+            editor.isActive("codeBlock") && "bg-accent text-accent-foreground",
           )}
           aria-label="Code Block"
         >
@@ -262,7 +259,7 @@ export function RichTextEditor({
           size="icon-sm"
           onClick={setLink}
           className={cn(
-            editor.isActive("link") && "bg-accent text-accent-foreground"
+            editor.isActive("link") && "bg-accent text-accent-foreground",
           )}
           aria-label="Add Link"
         >
@@ -309,4 +306,3 @@ export function RichTextEditor({
     </div>
   );
 }
-

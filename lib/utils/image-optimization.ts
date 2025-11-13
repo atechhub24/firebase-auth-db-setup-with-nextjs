@@ -14,7 +14,7 @@ export interface ImageOptimizationOptions {
  */
 export async function optimizeImage(
   file: File,
-  options: ImageOptimizationOptions = {}
+  options: ImageOptimizationOptions = {},
 ): Promise<File> {
   const {
     maxSizeMB = 0.5, // Target 500KB max
@@ -66,4 +66,3 @@ export function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + " KB";
   return (bytes / (1024 * 1024)).toFixed(2) + " MB";
 }
-
