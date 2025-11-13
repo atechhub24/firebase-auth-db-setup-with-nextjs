@@ -1,8 +1,8 @@
-# Firebase Auth + Realtime DB Starter (Next.js 15)
+# Firebase Auth + Realtime DB Starter (Next.js 15) ⚡️
 
-A batteries-included Next.js 15.5 app wired to Firebase Authentication, Realtime Database, and an opinionated admin/marketing UI built on top of shadcn/ui. Use it as a reference or starter for SaaS dashboards that need role-aware access, attendance tracking, and editorial tooling out of the box.
+Next.js 15.5 + Firebase starter for role-aware dashboards, attendance tooling, and blog CMS—powered by shadcn/ui and Turbopack.
 
-## Stack
+## 🧰 Stack
 
 <p align="left">
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nextjs/nextjs-original.svg" alt="Next.js" title="Next.js App Router" height="48" />
@@ -15,26 +15,22 @@ A batteries-included Next.js 15.5 app wired to Firebase Authentication, Realtime
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg" alt="CSS3" title="Tailwind preflight + custom styles" height="48" />
 </p>
 
-- Next.js App Router + React 19 + Turbopack dev/build
-- Firebase Auth + Realtime Database via `@atechhub/firebase`
-- Zustand app store with role-based guards
-- Tailwind CSS v4 + shadcn/ui component library (Radix primitives)
-- UploadThing for asset uploads, Leaflet + Recharts for maps/charts, Tiptap rich text editor
-- Biome for linting/formatting
+- Next.js App Router + React 19 + Turbopack
+- Firebase Auth + Realtime Database (`@atechhub/firebase`)
+- Zustand store + shadcn/ui (Radix) + Tailwind v4
+- UploadThing, Leaflet, Recharts, Tiptap
+- Biome for lint + format
 
-## Highlights
+## ✨ Highlights
 
-- Auth flows (sign up/sign in) backed by Firebase, configurable via `.env.local`
-- `FirebaseProvider` wires auth state to Zustand and protects auth routes
-- Role-aware dashboard shell (`admin`, `staff`) with sidebar, header, breadcrumbs, and command palette
-- Attendance workspace with analytics, history, maps, and punch controls
-- Blog CMS pages (marketing list + role-restricted CRUD surface)
-- Settings pages for profile + password management
-- Marketing blog listing and slug pages for public consumption
-- Extensive shadcn/ui component exports (`components/ui`) ready for reuse
-- Service layer abstractions under `lib/services` and shared types under `lib/types`
+- 🔐 Firebase auth with reusable `<AuthForm />`
+- 🧭 Role-aware shell (`admin`, `staff`) + command palette
+- 🕒 Attendance analytics, maps, punch controls
+- 📰 Blog CMS (public marketing + admin CRUD)
+- 🛠 Settings for profile/password + shared UI kit
+- 🧱 Service + types layers ready for expansion
 
-## Project Structure
+## 🗂 Project Structure
 
 ```text
 app/
@@ -61,7 +57,7 @@ lib/
 public/             # Static assets (icons, illustrations)
 ```
 
-## Getting Started
+## 🚀 Quick Start
 
 ```bash
 bun install
@@ -70,7 +66,7 @@ bun run dev         # next dev --turbopack on http://localhost:3000
 
 Need to target a specific role? Navigate to `/admin/...` or `/staff/...` — layouts and menu items adapt based on the stored user role.
 
-## Share Your Local Build
+## 🌍 Share Your Local Build
 
 Use an SSH reverse tunnel to expose the dev server for external validators:
 
@@ -84,7 +80,7 @@ That command returns a publicly reachable HTTPS URL (for example, `https://<rand
 - Test webhook callbacks or integrations that need a public endpoint.
 - Share in-progress work with teammates without deploying.
 
-## Environment Variables
+## 🔑 Environment Variables
 
 Create `.env.local` at the project root:
 
@@ -102,7 +98,7 @@ UPLOADTHING_TOKEN=optional_uploadthing_token
 
 `lib/env.ts` validates this schema at runtime; missing keys throw a descriptive error during boot so you catch misconfiguration early.
 
-## Firebase Setup Helper
+## 🛠 Firebase Setup Helper
 
 1. Visit the [Firebase Console](https://console.firebase.google.com/) and create a Web app inside your project. Copy the generated `firebaseConfig` object.
 2. Open the companion tool at [firebase.atechhub247.com](https://firebase.atechhub247.com/) and paste the config into the **Firebase Config → .env Converter**. Select the **Next.js** output, then copy the generated `.env.local` snippet.
@@ -117,8 +113,6 @@ This workflow keeps secrets consistent while avoiding typos in your environment 
 - `useAuthGuard` redirects authenticated users away from `/signin`.
 - Role-based menu items come from `hooks/use-menu-items.ts`, matching `UserRole` types at `lib/types/user.type.ts`.
 
-To extend roles, update the type + navigation map and ensure your database users carry the new `role`.
-
 ## Attendance & Staff Modules
 
 - `app/[role]/attendance` bundles analytics, map, calendar, and punch widgets, reusing service helpers from `lib/services/attendance.service.ts`.
@@ -131,12 +125,12 @@ To extend roles, update the type + navigation map and ensure your database users
 - Admin CRUD pages reuse shared forms (`blog-form.tsx`) and UploadThing integration for media.
 - Tiptap rich text editor (`components/ui/rich-text-editor.tsx`) powers content editing/rendering.
 
-## Meta & Asset Validation
+## 🖼 Meta & Asset Validation
 
 - **Open Graph preview**: capture the tunnel URL from above and drop it into [opengraph.dev](https://opengraph.dev/). The tool fetches your page as social bots do, letting you verify titles, descriptions, and OG images quickly.
 - **Favicon generation**: export high-res artwork (SVG or PNG) and feed it to [favicon.io/favicon-converter](https://favicon.io/favicon-converter/). It outputs favicon.ico plus platform-specific PNGs you can place under `public/`.
 
-## Scripts & Tooling
+## 🧪 Scripts & Tooling
 
 | Command          | Description                  |
 | ---------------- | ---------------------------- |
@@ -148,7 +142,7 @@ To extend roles, update the type + navigation map and ensure your database users
 
 BIome doubles as linter and formatter; keep CI happy by running `bun run format && bun run lint` before pushing.
 
-## Customization Notes
+## 🧩 Customization Notes
 
 - Tailwind CSS v4 config lives in `postcss.config.mjs`; utility classes lean on semantic slots rather than custom theme tokens.
 - Command palette + sidebar structure lives in `components/layout` and `components/core` — adjust navigation there.
