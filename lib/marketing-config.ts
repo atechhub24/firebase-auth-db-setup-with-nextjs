@@ -44,6 +44,42 @@ export const marketingSite = {
       href: "https://firebase.atechhub247.com/",
     },
   ],
+  megaMenu: [
+    {
+      label: "Resources",
+      href: "#resources",
+      items: [
+        {
+          label: "Firebase Console",
+          href: "https://console.firebase.google.com",
+          icon: "Database",
+          description: "Manage your Firebase projects, authentication, and database",
+          featured: true,
+        },
+        {
+          label: "Config Generator",
+          href: "https://firebase.atechhub247.com",
+          icon: "Settings",
+          description: "Convert Firebase config to environment variables",
+          featured: true,
+        },
+        {
+          label: "Open Graph Preview",
+          href: "https://opengraph.dev",
+          icon: "Image",
+          description: "Preview and generate Open Graph meta tags for social sharing",
+          featured: false,
+        },
+        {
+          label: "Favicon Generator",
+          href: "https://favicon.io/favicon-converter",
+          icon: "FileCode",
+          description: "Generate favicons from images in multiple formats",
+          featured: false,
+        },
+      ],
+    },
+  ],
 } as const;
 
 export type MarketingSite = typeof marketingSite;
