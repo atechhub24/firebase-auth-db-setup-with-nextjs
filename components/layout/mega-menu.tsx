@@ -12,7 +12,13 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { Badge } from "@/components/ui/badge";
-import { Database, Settings, Image, FileCode, ExternalLink } from "lucide-react";
+import {
+  Database,
+  Settings,
+  Image,
+  FileCode,
+  ExternalLink,
+} from "lucide-react";
 import type { MarketingSite } from "@/lib/marketing-config";
 import { cn } from "@/lib/utils";
 
@@ -117,4 +123,3 @@ export function MegaMenu({ label, href, items }: MegaMenuProps) {
     </NavigationMenu>
   );
 }
-

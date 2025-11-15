@@ -53,7 +53,8 @@ export const marketingSite = {
           label: "Firebase Console",
           href: "https://console.firebase.google.com",
           icon: "Database",
-          description: "Manage your Firebase projects, authentication, and database",
+          description:
+            "Manage your Firebase projects, authentication, and database",
           featured: true,
         },
         {
@@ -67,7 +68,8 @@ export const marketingSite = {
           label: "Open Graph Preview",
           href: "https://opengraph.dev",
           icon: "Image",
-          description: "Preview and generate Open Graph meta tags for social sharing",
+          description:
+            "Preview and generate Open Graph meta tags for social sharing",
           featured: false,
         },
         {

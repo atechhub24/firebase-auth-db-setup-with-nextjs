@@ -3,9 +3,23 @@
 import * as React from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
-import { X, Database, Settings, Image, FileCode, ExternalLink, LogIn, ArrowRight } from "lucide-react";
+import {
+  X,
+  Database,
+  Settings,
+  Image,
+  FileCode,
+  ExternalLink,
+  LogIn,
+  ArrowRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/core/theme-toggle";
 import type { MarketingSite } from "@/lib/marketing-config";
@@ -67,7 +81,9 @@ export function MobileMenu({
             <div className="flex h-full flex-col">
               {/* Header */}
               <div className="flex h-16 items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4">
-                <span className="text-base font-semibold text-gray-900 dark:text-gray-100">Menu</span>
+                <span className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                  Menu
+                </span>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -90,7 +106,10 @@ export function MobileMenu({
                           collapsible
                           className="w-full"
                         >
-                          <AccordionItem value="resources" className="border-none">
+                          <AccordionItem
+                            value="resources"
+                            className="border-none"
+                          >
                             <AccordionTrigger className="py-3 text-sm font-medium text-gray-900 dark:text-gray-100 hover:no-underline">
                               {link.label}
                             </AccordionTrigger>
@@ -99,7 +118,8 @@ export function MobileMenu({
                                 {resourcesItems.map((item, itemIndex) => {
                                   const Icon =
                                     iconMap[item.icon as keyof typeof iconMap];
-                                  const isExternal = item.href.startsWith("http");
+                                  const isExternal =
+                                    item.href.startsWith("http");
 
                                   return (
                                     <motion.div
@@ -113,7 +133,9 @@ export function MobileMenu({
                                     >
                                       <Link
                                         href={item.href}
-                                        target={isExternal ? "_blank" : undefined}
+                                        target={
+                                          isExternal ? "_blank" : undefined
+                                        }
                                         rel={
                                           isExternal
                                             ? "noopener noreferrer"
@@ -147,9 +169,9 @@ export function MobileMenu({
                                               <ExternalLink className="size-3 shrink-0 text-gray-400 dark:text-gray-500 opacity-0 transition-opacity group-hover:opacity-100" />
                                             )}
                                           </div>
-                                            <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
-                                              {item.description}
-                                            </p>
+                                          <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                                            {item.description}
+                                          </p>
                                         </div>
                                       </Link>
                                     </motion.div>
@@ -225,4 +247,3 @@ export function MobileMenu({
     </AnimatePresence>
   );
 }
-
