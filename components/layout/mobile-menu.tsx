@@ -38,7 +38,7 @@ interface MobileMenuProps {
   open: boolean;
   onClose: () => void;
   navLinks: Array<{ label: string; href: string }>;
-  resourcesItems: MegaMenuItem[];
+  resourcesItems: readonly MegaMenuItem[];
   toggleTheme: () => void;
 }
 

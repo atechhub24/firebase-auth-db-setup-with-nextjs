@@ -32,7 +32,7 @@ const iconMap = {
 type MegaMenuItem = MarketingSite["megaMenu"][number]["items"][number];
 
 interface MegaMenuContentProps {
-  items: MegaMenuItem[];
+  items: readonly MegaMenuItem[];
 }
 
 function MegaMenuContent({ items }: MegaMenuContentProps) {
@@ -104,7 +104,7 @@ function MegaMenuContent({ items }: MegaMenuContentProps) {
 interface MegaMenuProps {
   label: string;
   href: string;
-  items: MegaMenuItem[];
+  items: readonly MegaMenuItem[];
 }
 
 export function MegaMenu({ label, href, items }: MegaMenuProps) {
