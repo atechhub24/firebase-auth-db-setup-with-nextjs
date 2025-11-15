@@ -43,10 +43,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         blog.updatedAt && typeof blog.updatedAt === "string"
           ? new Date(blog.updatedAt)
           : blog.publishedAt && typeof blog.publishedAt === "number"
-          ? new Date(blog.publishedAt)
-          : blog.createdAt && typeof blog.createdAt === "string"
-          ? new Date(blog.createdAt)
-          : new Date(),
+            ? new Date(blog.publishedAt)
+            : blog.createdAt && typeof blog.createdAt === "string"
+              ? new Date(blog.createdAt)
+              : new Date(),
       changeFrequency: "weekly" as const,
       priority: blog.featured ? 0.8 : 0.7,
     }));

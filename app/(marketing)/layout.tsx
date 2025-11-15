@@ -5,7 +5,7 @@ import { marketingSite } from "@/lib/marketing-config";
 
 const ogImageUrl = new URL(
   "/opengraph-image",
-  marketingSite.url.endsWith("/") ? marketingSite.url : `${marketingSite.url}/`
+  marketingSite.url.endsWith("/") ? marketingSite.url : `${marketingSite.url}/`,
 ).toString();
 
 export const metadata: Metadata = {

@@ -16,7 +16,8 @@ export default function NotFound() {
         Lost in the Firebase Forest
       </h1>
       <p className="mt-3 max-w-xl text-center text-muted-foreground">
-        We couldn&apos;t find the route you&apos;re looking for. Explore the latest from{" "}
+        We couldn&apos;t find the route you&apos;re looking for. Explore the
+        latest from{" "}
         <span className="font-medium text-foreground">
           {marketingSite.title}
         </span>{" "}
@@ -39,4 +40,3 @@ export default function NotFound() {
     </div>
   );
 }
-

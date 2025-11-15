@@ -10,7 +10,7 @@ export default function PrivacyPage() {
       year: "numeric",
       month: "long",
       day: "numeric",
-    }
+    },
   );
 
   return (
@@ -719,7 +719,7 @@ export default function PrivacyPage() {
                   <Link
                     href={`tel:${marketingSite.contactPhone.replace(
                       /[^\d+]/g,
-                      ""
+                      "",
                     )}`}
                     className="text-primary underline hover:no-underline"
                   >
