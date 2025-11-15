@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 import { marketingSite } from "@/lib/marketing-config";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/core/theme-toggle";
@@ -16,6 +17,7 @@ const marketingNavLinks = [
 
 export function MarketingNavbar() {
   const [open, setOpen] = useState(false);
+  const { theme, resolvedTheme, setTheme } = useTheme();
 
   useEffect(() => {
     if (open) {
@@ -29,6 +31,11 @@ export function MarketingNavbar() {
   }, [open]);
 
   const toggleMenu = () => setOpen((prev) => !prev);
+
+  const toggleTheme = () => {
+    const current = resolvedTheme || theme;
+    setTheme(current === "dark" ? "light" : "dark");
+  };
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur">
@@ -142,7 +149,16 @@ export function MarketingNavbar() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15, duration: 0.2 }}
               >
-                <ThemeToggle />
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  className="flex h-10 w-full items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  <div className="pointer-events-none">
+                    <ThemeToggle />
+                  </div>
+                  <span>Toggle theme</span>
+                </button>
                 <Button variant="outline" asChild>
                   <Link
                     href="/signin"
