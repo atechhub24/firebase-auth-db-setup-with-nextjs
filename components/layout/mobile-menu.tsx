@@ -34,10 +34,12 @@ const iconMap = {
 
 type MegaMenuItem = MarketingSite["megaMenu"][number]["items"][number];
 
+type NavLink = { readonly label: string; readonly href: string };
+
 interface MobileMenuProps {
   open: boolean;
   onClose: () => void;
-  navLinks: Array<{ label: string; href: string }>;
+  navLinks: readonly NavLink[];
   resourcesItems: readonly MegaMenuItem[];
   toggleTheme: () => void;
 }
