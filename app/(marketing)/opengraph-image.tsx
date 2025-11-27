@@ -1,4 +1,4 @@
-import { marketingSite } from "@/lib/marketing-config";
+import { marketingSite } from "@/lib/config/marketing";
 import { ImageResponse } from "next/og";
 
 export const alt = marketingSite.title;

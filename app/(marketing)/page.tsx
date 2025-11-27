@@ -1,4 +1,5 @@
 import { TestimonialsMarquee } from "@/components/home/testimonials-marquee";
+import { testimonials } from "@/lib/config/testimonials";
 
 export default function MarketingHome() {
   return (
@@ -11,7 +12,7 @@ export default function MarketingHome() {
           </h1>
         </div>
       </section>
-      <TestimonialsMarquee />
+      <TestimonialsMarquee testimonials={testimonials} />
     </>
   );
 }

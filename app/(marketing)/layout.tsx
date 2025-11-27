@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { MarketingFooter } from "@/components/layout/marketing-footer";
 import { MarketingNavbar } from "@/components/layout/marketing-navbar";
-import { marketingSite } from "@/lib/marketing-config";
+import { marketingSite } from "@/lib/config/marketing";
 
 const ogImageUrl = new URL(
   "/opengraph-image",

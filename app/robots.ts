@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { marketingSite } from "@/lib/marketing-config";
+import { marketingSite } from "@/lib/config/marketing";
 
 export default function robots(): MetadataRoute.Robots {
   const baseUrl = marketingSite.url;

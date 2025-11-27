@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { marketingSite } from "@/lib/marketing-config";
+import { marketingSite } from "@/lib/config/marketing";
 import { blogService } from "@/lib/services/blog.service";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
