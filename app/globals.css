@@ -159,4 +159,13 @@
   .animate-marquee-vertical {
     animation: marquee-vertical var(--duration, 40s) linear infinite;
   }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
