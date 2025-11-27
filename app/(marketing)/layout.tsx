@@ -5,11 +5,14 @@ import { marketingSite } from "@/lib/marketing-config";
 
 const ogImageUrl = new URL(
   "/opengraph-image",
-  marketingSite.url.endsWith("/") ? marketingSite.url : `${marketingSite.url}/`,
+  marketingSite.url.endsWith("/") ? marketingSite.url : `${marketingSite.url}/`
 ).toString();
 
 export const metadata: Metadata = {
-  title: marketingSite.title,
+  title: {
+    default: marketingSite.title,
+    template: `%s | ${marketingSite.title}`,
+  },
   description: marketingSite.description,
   openGraph: {
     title: marketingSite.title,
@@ -44,9 +47,7 @@ export default function MarketingLayout({
   return (
     <div className="min-h-screen bg-background text-foreground relative">
       <MarketingNavbar />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 relative z-0">
-        {children}
-      </main>
+      <main>{children}</main>
       <MarketingFooter />
     </div>
   );

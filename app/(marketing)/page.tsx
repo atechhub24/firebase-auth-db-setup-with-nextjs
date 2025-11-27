@@ -1,9 +1,17 @@
+import { TestimonialsMarquee } from "@/components/home/testimonials-marquee";
+
 export default function MarketingHome() {
   return (
-    <div className="py-10">
-      <h1 className="text-3xl font-bold">
-        Hello from Firebase Auth + Realtime DB Starter
-      </h1>
-    </div>
+    <>
+      {/*  */}
+      <section className="bg-primary/15">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+          <h1 className="text-3xl font-bold">
+            Hello from Firebase Auth + Realtime DB Starter
+          </h1>
+        </div>
+      </section>
+      <TestimonialsMarquee />
+    </>
   );
 }

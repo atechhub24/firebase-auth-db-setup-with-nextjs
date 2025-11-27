@@ -21,7 +21,7 @@ export function MarketingFooter() {
   return (
     <footer className="border-t bg-muted/40">
       <motion.div
-        className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between"
+        className="mx-auto flex max-w-7xl flex-col gap-6 px-4 sm:px-6 lg:px-8 py-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between"
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}

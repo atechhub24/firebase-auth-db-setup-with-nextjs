@@ -30,13 +30,13 @@ export function MarketingNavbar() {
 
   const resourcesMenu = marketingSite.megaMenu[0];
   const simpleNavLinks = marketingNavLinks.filter(
-    (link) => link.href !== "#resources",
+    (link) => link.href !== "#resources"
   );
 
   return (
     <>
       <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="text-base font-semibold tracking-tight">
             {marketingSite.title}
           </Link>
