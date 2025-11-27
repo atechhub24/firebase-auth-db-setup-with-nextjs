@@ -1,7 +1,7 @@
 "use client";
 
 import { FileText, CheckCircle, Clock, Star, Calendar } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useFirebaseRealtime } from "@/hooks/use-firebase-realtime";
 import {
   Card,
   CardContent,
@@ -10,33 +10,27 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { blogService } from "@/lib/services/blog.service";
 import type { Blog } from "@/lib/types/blog.type";
 import { BlogsList } from "./_components/blogs-list";
 import { motion } from "motion/react";
 
 export default function BlogsPage() {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, loading, error } = useFirebaseRealtime<Blog>("blogs", {
+    asArray: true,
+    sort: (a, b) => {
+      const aTime =
+        typeof a.createdAt === "string"
+          ? new Date(a.createdAt).getTime()
+          : 0;
+      const bTime =
+        typeof b.createdAt === "string"
+          ? new Date(b.createdAt).getTime()
+          : 0;
+      return bTime - aTime;
+    },
+  });
 
-  const fetchBlogs = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await blogService.getAll();
-      setBlogs(data);
-    } catch (err) {
-      console.error("Error fetching blogs:", err);
-      setError("Failed to load blogs. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchBlogs();
-  }, []);
+  const blogs = (data as Blog[]) || [];
 
   // Calculate stats
   const now = new Date();
@@ -96,16 +90,12 @@ export default function BlogsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-red-600">Error</CardTitle>
-            <CardDescription>{error}</CardDescription>
+            <CardDescription>
+              {error instanceof Error
+                ? error.message
+                : "Failed to load blogs. Please try again."}
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <button
-              onClick={fetchBlogs}
-              className="text-blue-600 hover:text-blue-800 underline"
-            >
-              Try again
-            </button>
-          </CardContent>
         </Card>
       </div>
     );
@@ -231,7 +221,7 @@ export default function BlogsPage() {
       </div>
 
       {/* Blogs List */}
-      <BlogsList blogs={blogs} onRefresh={fetchBlogs} />
+      <BlogsList blogs={blogs} onRefresh={() => {}} />
     </div>
   );
 }
