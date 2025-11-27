@@ -25,6 +25,13 @@ const envSchema = z.object({
   NEXT_PUBLIC_FIREBASE_AUTH_URL: z
     .string()
     .url("Firebase Auth URL must be a valid URL"),
+  // Firebase Admin SDK Configuration (server-only, optional)
+  FIREBASE_PROJECT_ID: z.string().min(1).optional(),
+  FIREBASE_CLIENT_EMAIL: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.string().email("Invalid email format").optional()
+  ),
+  FIREBASE_PRIVATE_KEY: z.string().min(1).optional(),
   // UploadThing Configuration (server-only, optional)
   UPLOADTHING_TOKEN: z.string().min(1).optional(),
 });
@@ -46,17 +53,20 @@ function validateEnv() {
         process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
       NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
       NEXT_PUBLIC_FIREBASE_AUTH_URL: process.env.NEXT_PUBLIC_FIREBASE_AUTH_URL,
+      FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID || undefined,
+      FIREBASE_CLIENT_EMAIL: process.env.FIREBASE_CLIENT_EMAIL || undefined,
+      FIREBASE_PRIVATE_KEY: process.env.FIREBASE_PRIVATE_KEY || undefined,
       UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN || undefined,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
       const missingVars = error.issues.map(
-        (err) => `${err.path.join(".")}: ${err.message}`,
+        (err) => `${err.path.join(".")}: ${err.message}`
       );
       throw new Error(
         "Invalid environment variables:\n" +
           missingVars.join("\n") +
-          "\n\nPlease check your .env.local file.",
+          "\n\nPlease check your .env.local file."
       );
     }
     throw error;
@@ -84,4 +94,20 @@ export const firebaseConfig = {
 export const firebaseAuthConfig = {
   authUrl: env.NEXT_PUBLIC_FIREBASE_AUTH_URL,
   apiKey: env.NEXT_PUBLIC_FIREBASE_API_KEY,
+};
+
+// Firebase Admin SDK configuration (server-only)
+export const firebaseAdminConfig = {
+  projectId: env.FIREBASE_PROJECT_ID,
+  clientEmail: env.FIREBASE_CLIENT_EMAIL,
+  privateKey: env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+} as const;
+
+// Helper to check if Firebase Admin is configured
+export const isFirebaseAdminConfigured = (): boolean => {
+  return !!(
+    env.FIREBASE_PROJECT_ID &&
+    env.FIREBASE_CLIENT_EMAIL &&
+    env.FIREBASE_PRIVATE_KEY
+  );
 };
