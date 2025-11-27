@@ -5,7 +5,23 @@ import { Highlight } from "@/components/home/testimonials-marquee";
 
 export const testimonials: TestimonialItem[] = [
   {
-    name: "Alex Chen",
+    name: "Rajesh Kumar",
+    role: "CEO, TechStart Solutions",
+    description: (
+      <p>
+        This starter template has been instrumental in getting our product to
+        market 40% faster.
+        <Highlight>
+          The Firebase integration and role-based access control saved us months
+          of development time.
+        </Highlight>{" "}
+        We were able to focus on our core business logic instead of building
+        authentication from scratch.
+      </p>
+    ),
+  },
+  {
+    name: "Priya Sharma",
     role: "Senior Full-Stack Developer",
     description: (
       <p>
@@ -20,7 +36,22 @@ export const testimonials: TestimonialItem[] = [
     ),
   },
   {
-    name: "Sarah Martinez",
+    name: "Arjun Patel",
+    role: "Founder & Business Owner",
+    description: (
+      <p>
+        As a non-technical founder, this template was a lifesaver.
+        <Highlight>
+          The pre-built components and Firebase setup meant we could launch our
+          MVP in weeks instead of months.
+        </Highlight>{" "}
+        The ROI on development costs has been exceptional, and the code quality
+        is production-ready.
+      </p>
+    ),
+  },
+  {
+    name: "Ananya Reddy",
     role: "Frontend Engineer",
     description: (
       <p>
@@ -34,22 +65,53 @@ export const testimonials: TestimonialItem[] = [
     ),
   },
   {
-    name: "Michael Thompson",
+    name: "Vikram Singh",
+    role: "CEO, Digital Innovations Inc",
+    description: (
+      <p>
+        The attendance tracking and analytics features saved us from building
+        custom solutions.
+        <Highlight>
+          Our team productivity increased by 30% after implementing the
+          dashboard system.
+        </Highlight>{" "}
+        The real-time updates and Firebase integration work flawlessly at scale.
+      </p>
+    ),
+  },
+  {
+    name: "Meera Nair",
     role: "UI/UX Developer",
     description: (
       <p>
         Tailwind CSS v4 is hands down the best CSS framework I&apos;ve worked
         with.
         <Highlight>
-          Utility-first approach combined with the new CSS variables system gives
-          me complete design control without leaving my HTML.
+          Utility-first approach combined with the new CSS variables system
+          gives me complete design control without leaving my HTML.
         </Highlight>{" "}
         Shipping beautiful UIs has never been faster.
       </p>
     ),
   },
   {
-    name: "David Kim",
+    name: "Sandeep Malhotra",
+    role: "Business Owner",
+    description: (
+      <p>
+        We needed a scalable solution for our SaaS platform, and this delivered
+        beyond expectations.
+        <Highlight>
+          The blog CMS and admin features allowed us to manage content without
+          additional tools.
+        </Highlight>{" "}
+        The clean architecture makes it easy for our developers to extend and
+        customize.
+      </p>
+    ),
+  },
+  {
+    name: "Deepak Joshi",
     role: "Backend Architect",
     description: (
       <p>
@@ -64,7 +126,22 @@ export const testimonials: TestimonialItem[] = [
     ),
   },
   {
-    name: "Emma Wilson",
+    name: "Kavita Desai",
+    role: "CEO, StartupHub",
+    description: (
+      <p>
+        We evaluated multiple starter templates, and this one stood out.
+        <Highlight>
+          The comprehensive feature set and TypeScript-first approach gave us
+          confidence in code quality.
+        </Highlight>{" "}
+        Our investors were impressed with how quickly we delivered a polished
+        product.
+      </p>
+    ),
+  },
+  {
+    name: "Rahul Verma",
     role: "State Management Specialist",
     description: (
       <p>
@@ -78,100 +155,32 @@ export const testimonials: TestimonialItem[] = [
     ),
   },
   {
-    name: "James Rodriguez",
+    name: "Sneha Iyer",
+    role: "Business Owner",
+    description: (
+      <p>
+        The command palette and role-based dashboard features transformed our
+        workflow.
+        <Highlight>
+          Our team can now access features quickly, and the admin controls make
+          user management effortless.
+        </Highlight>{" "}
+        The user experience has received consistent positive feedback from our
+        clients.
+      </p>
+    ),
+  },
+  {
+    name: "Aditya Menon",
     role: "Component Library Maintainer",
     description: (
       <p>
         shadcn/ui built on Radix is exactly what the React ecosystem needed.
         <Highlight>
-          Copy-paste components that we own, built on accessible primitives, with
-          Tailwind styling.
+          Copy-paste components that we own, built on accessible primitives,
+          with Tailwind styling.
         </Highlight>{" "}
         We can customize everything while maintaining accessibility standards.
-      </p>
-    ),
-  },
-  {
-    name: "Lisa Anderson",
-    role: "DevOps Engineer",
-    description: (
-      <p>
-        UploadThing has simplified file uploads beyond what I thought possible.
-        <Highlight>
-          The React hooks API and automatic file handling make complex upload
-          flows trivial to implement.
-        </Highlight>{" "}
-        No more dealing with S3 configurations or storage complexities.
-      </p>
-    ),
-  },
-  {
-    name: "Robert Taylor",
-    role: "Node.js Developer",
-    description: (
-      <p>
-        Node.js continues to be the backbone of our server infrastructure.
-        <Highlight>
-          The async/await patterns and the rich npm ecosystem make building
-          scalable backends incredibly efficient.
-        </Highlight>{" "}
-        Perfect integration with Next.js API routes.
-      </p>
-    ),
-  },
-  {
-    name: "Jennifer Lee",
-    role: "TypeScript Advocate",
-    description: (
-      <p>
-        TypeScript has eliminated entire classes of runtime errors from our
-        codebase.
-        <Highlight>
-          The type safety and excellent IDE support make refactoring large
-          codebases much safer and faster.
-        </Highlight>{" "}
-        It&apos;s become essential for any serious JavaScript project.
-      </p>
-    ),
-  },
-  {
-    name: "Kevin Park",
-    role: "Build Performance Engineer",
-    description: (
-      <p>
-        Turbopack is a game-changer for development speed.
-        <Highlight>
-          Incremental compilation and intelligent caching make rebuilds nearly
-          instant even in large monorepos.
-        </Highlight>{" "}
-        The difference in developer productivity is immediately noticeable.
-      </p>
-    ),
-  },
-  {
-    name: "Amy Johnson",
-    role: "Developer Tools Specialist",
-    description: (
-      <p>
-        Biome has replaced ESLint and Prettier in all our projects.
-        <Highlight>
-          Single tool for linting and formatting with Rust-powered performance.
-        </Highlight>{" "}
-        Configuration is minimal, and it just works out of the box.
-      </p>
-    ),
-  },
-  {
-    name: "Chris Brown",
-    role: "Data Visualization Expert",
-    description: (
-      <p>
-        Recharts makes building complex data visualizations in React a breeze.
-        <Highlight>
-          Declarative API with composable components means I can create beautiful
-          charts quickly without fighting with D3.
-        </Highlight>{" "}
-        Perfect integration with our design system.
       </p>
     ),
   },
