@@ -1,4 +1,4 @@
-import { Home, Settings, Users2Icon, Clock, FileText } from "lucide-react";
+import { Home, Settings, Users2Icon, Clock, FileText, Bell } from "lucide-react";
 import type { UserRole } from "@/lib/types/user.type";
 
 export type NavigationItem = {
@@ -32,6 +32,12 @@ export function useMenuItems() {
       title: "Blogs",
       url: "/blogs",
       icon: FileText,
+      roles: ["admin"],
+    },
+    {
+      title: "Send Notifications",
+      url: "/notifications",
+      icon: Bell,
       roles: ["admin"],
     },
   ];

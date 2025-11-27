@@ -32,6 +32,9 @@ const envSchema = z.object({
     z.string().email("Invalid email format").optional()
   ),
   FIREBASE_PRIVATE_KEY: z.string().min(1).optional(),
+  // Firebase VAPID Keys for Push Notifications (optional)
+  NEXT_PUBLIC_FIREBASE_VAPID_KEY: z.string().min(1).optional(),
+  FIREBASE_VAPID_PRIVATE_KEY: z.string().min(1).optional(),
   // UploadThing Configuration (server-only, optional)
   UPLOADTHING_TOKEN: z.string().min(1).optional(),
 });
@@ -56,6 +59,10 @@ function validateEnv() {
       FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID || undefined,
       FIREBASE_CLIENT_EMAIL: process.env.FIREBASE_CLIENT_EMAIL || undefined,
       FIREBASE_PRIVATE_KEY: process.env.FIREBASE_PRIVATE_KEY || undefined,
+      NEXT_PUBLIC_FIREBASE_VAPID_KEY:
+        process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY || undefined,
+      FIREBASE_VAPID_PRIVATE_KEY:
+        process.env.FIREBASE_VAPID_PRIVATE_KEY || undefined,
       UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN || undefined,
     });
   } catch (error) {
@@ -101,6 +108,12 @@ export const firebaseAdminConfig = {
   projectId: env.FIREBASE_PROJECT_ID,
   clientEmail: env.FIREBASE_CLIENT_EMAIL,
   privateKey: env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+} as const;
+
+// Firebase VAPID configuration for push notifications
+export const firebaseVapidConfig = {
+  publicKey: env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+  privateKey: env.FIREBASE_VAPID_PRIVATE_KEY,
 } as const;
 
 // Helper to check if Firebase Admin is configured
