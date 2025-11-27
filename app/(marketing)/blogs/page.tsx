@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
-import { blogService } from "@/lib/services/blog.service";
+import { useMemo } from "react";
+import { useFirebaseRealtime } from "@/hooks/use-firebase-realtime";
 import type { Blog } from "@/lib/types/blog.type";
 import { BlogCard } from "./_components/blog-card";
 import { BlogFilters } from "./_components/blog-filters";
 import { BlogSortControls } from "./_components/blog-sort-controls";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   useQueryState,
   parseAsArrayOf,
@@ -20,53 +19,47 @@ import { BookOpen, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 export default function BlogsPage() {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, loading, error } = useFirebaseRealtime<Blog>("blogs", {
+    asArray: true,
+    filter: (blog) => blog.status === "published",
+    sort: (a, b) => {
+      const aTime =
+        a.publishedAt ||
+        (typeof a.createdAt === "string" ? new Date(a.createdAt).getTime() : 0);
+      const bTime =
+        b.publishedAt ||
+        (typeof b.createdAt === "string" ? new Date(b.createdAt).getTime() : 0);
+      return bTime - aTime;
+    },
+  });
+
+  const blogs = (data as Blog[]) || [];
 
   const [searchTerm, setSearchTerm] = useQueryState(
     "search",
-    parseAsString.withDefault(""),
+    parseAsString.withDefault("")
   );
   const [selectedCategories] = useQueryState(
     "categories",
-    parseAsArrayOf(parseAsString).withDefault([]),
+    parseAsArrayOf(parseAsString).withDefault([])
   );
   const [selectedTags] = useQueryState(
     "tags",
-    parseAsArrayOf(parseAsString).withDefault([]),
+    parseAsArrayOf(parseAsString).withDefault([])
   );
   const [selectedAuthor] = useQueryState(
     "author",
-    parseAsString.withDefault("all"),
+    parseAsString.withDefault("all")
   );
   const [showFeaturedOnly] = useQueryState(
     "featured",
-    parseAsBoolean.withDefault(false),
+    parseAsBoolean.withDefault(false)
   );
   const [sortOption] = useQueryState(
     "sort",
-    parseAsString.withDefault("new-first"),
+    parseAsString.withDefault("new-first")
   );
   const [viewMode] = useQueryState("view", parseAsString.withDefault("grid"));
-
-  const fetchBlogs = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await blogService.getPublished();
-      setBlogs(data);
-    } catch (err) {
-      console.error("Error fetching blogs:", err);
-      setError("Failed to load blogs. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchBlogs();
-  }, []);
 
   // Filter and sort blogs
   const filteredBlogs = useMemo(() => {
@@ -78,7 +71,7 @@ export default function BlogsPage() {
         blog.excerpt?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         blog.author?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         blog.tags?.some((tag) =>
-          tag.toLowerCase().includes(searchTerm.toLowerCase()),
+          tag.toLowerCase().includes(searchTerm.toLowerCase())
         );
 
       // Category filter
@@ -185,7 +178,11 @@ export default function BlogsPage() {
           className="rounded-2xl border-2 border-destructive/50 bg-destructive/10 p-8 text-center"
         >
           <h3 className="text-lg font-semibold text-destructive mb-2">Error</h3>
-          <p className="text-muted-foreground">{error}</p>
+          <p className="text-muted-foreground">
+            {error instanceof Error
+              ? error.message
+              : "Failed to load blogs. Please try again."}
+          </p>
         </motion.div>
       </div>
     );

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useParams } from "next/navigation";
-import { blogService } from "@/lib/services/blog.service";
+import { useFirebaseRealtime } from "@/hooks/use-firebase-realtime";
 import { getRelatedBlogs } from "@/lib/utils/blog-utils";
 import type { Blog } from "@/lib/types/blog.type";
 import { RichTextRenderer } from "@/components/ui/rich-text-renderer";
@@ -20,39 +20,26 @@ import { staggerContainer } from "@/lib/utils/motion-variants";
 export default function BlogDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
-  const [blog, setBlog] = useState<Blog | null>(null);
-  const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchBlog = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await blogService.getBySlug(slug);
-        if (!data) {
-          setError("Blog not found");
-          return;
-        }
-        setBlog(data);
+  const { data: allBlogsData, loading, error } = useFirebaseRealtime<Blog>(
+    "blogs",
+    {
+      asArray: true,
+      filter: (blog) => blog.status === "published",
+    },
+  );
 
-        // Fetch related blogs
-        const allBlogs = await blogService.getPublished();
-        const related = getRelatedBlogs(data, allBlogs, 3);
-        setRelatedBlogs(related);
-      } catch (err) {
-        console.error("Error fetching blog:", err);
-        setError("Failed to load blog. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const allBlogs = (allBlogsData as Blog[]) || [];
 
-    if (slug) {
-      fetchBlog();
-    }
-  }, [slug]);
+  const blog = useMemo(() => {
+    if (!slug || !allBlogs.length) return null;
+    return allBlogs.find((b) => b.slug === slug) || null;
+  }, [slug, allBlogs]);
+
+  const relatedBlogs = useMemo(() => {
+    if (!blog || !allBlogs.length) return [];
+    return getRelatedBlogs(blog, allBlogs, 3);
+  }, [blog, allBlogs]);
 
   if (loading) {
     return (
@@ -69,7 +56,7 @@ export default function BlogDetailPage() {
     );
   }
 
-  if (error || !blog) {
+  if (error) {
     return (
       <div className="container mx-auto p-4 sm:p-6 max-w-4xl">
         <motion.div
@@ -82,7 +69,35 @@ export default function BlogDetailPage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                {error || "Blog not found"}
+                {error instanceof Error ? error.message : "Failed to load blog. Please try again."}
+              </p>
+              <Link href="/blogs">
+                <Button variant="outline" className="mt-4">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Blogs
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (!loading && !blog) {
+    return (
+      <div className="container mx-auto p-4 sm:p-6 max-w-4xl">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+        >
+          <Card>
+            <CardHeader>
+              <h2 className="text-xl font-semibold text-red-600">Blog not found</h2>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                The blog you're looking for doesn't exist or has been removed.
               </p>
               <Link href="/blogs">
                 <Button variant="outline" className="mt-4">
