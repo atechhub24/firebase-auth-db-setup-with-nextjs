@@ -3,7 +3,7 @@
 import { format, isValid, parse } from "date-fns";
 import { BarChart3, List, MapPin } from "lucide-react";
 import { motion } from "motion/react";
-import { parseAsString, useQueryState, useQueryStates } from "nuqs";
+import { parseAsString, useQueryState } from "nuqs";
 import { useCallback, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useFirebaseRealtime } from "@/hooks/use-firebase-realtime";
@@ -12,7 +12,6 @@ import { AdminAttendance } from "./admin-attendance";
 import { AdminAttendanceAnalytics } from "./admin-attendance-analytics";
 import { AdminAttendanceCharts } from "./admin-attendance-charts";
 import { AdminAttendanceMap } from "./admin-attendance-map";
-import { AttendanceActions } from "./attendance-actions";
 import { AttendanceFilters } from "./attendance-filters";
 
 const tabs = [
@@ -48,12 +47,6 @@ export function AdminAttendanceView() {
     parseAsString.withDefault(format(new Date(), "yyyy-MM-dd")),
   );
 
-  // Get all query state setters for reset
-  const [, setFilters] = useQueryStates({
-    staff: parseAsString,
-    date: parseAsString,
-    analyticsPeriod: parseAsString,
-  });
 
   // Convert date string to Date object
   const selectedDate = dateStr
@@ -72,16 +65,6 @@ export function AdminAttendanceView() {
     },
     [setDateStr],
   );
-
-
-  const handleResetFilters = () => {
-    // Clear all filter query params (keeps tab)
-    setFilters({
-      staff: null,
-      date: null,
-      analyticsPeriod: null,
-    });
-  };
 
   return (
     <div className="container mx-auto p-4 sm:p-6 max-w-7xl space-y-6">
@@ -105,21 +88,15 @@ export function AdminAttendanceView() {
             })}
           </TabsList>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:flex-1 lg:flex-initial min-w-0">
-            <AttendanceFilters
-              selectedDate={selectedDate}
-              selectedStaffId={selectedStaffId || "all"}
-              staffs={staffs}
-              calendarOpen={calendarOpen}
-              onDateSelect={handleDateSelect}
-              onStaffSelect={setSelectedStaffId}
-              onCalendarOpenChange={setCalendarOpen}
-            />
-
-            <AttendanceActions
-              onResetFilters={handleResetFilters}
-            />
-          </div>
+          <AttendanceFilters
+            selectedDate={selectedDate}
+            selectedStaffId={selectedStaffId || "all"}
+            staffs={staffs}
+            calendarOpen={calendarOpen}
+            onDateSelect={handleDateSelect}
+            onStaffSelect={setSelectedStaffId}
+            onCalendarOpenChange={setCalendarOpen}
+          />
         </div>
 
         <TabsContent value="map" className="mt-0">
