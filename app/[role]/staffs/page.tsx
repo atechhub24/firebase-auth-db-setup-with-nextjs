@@ -1,7 +1,7 @@
 "use client";
 
 import { Building2, CheckCircle, Clock, Users } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useFirebaseRealtime } from "@/hooks/use-firebase-realtime";
 import {
   Card,
   CardContent,
@@ -10,32 +10,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { staffService } from "@/lib/services";
 import type { User } from "@/lib/types/user.type";
 import { StaffsTable } from "./_components/staffs-table";
 
 export default function StaffsPage() {
-  const [staffs, setStaffs] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, loading, error } = useFirebaseRealtime<User>("users", {
+    asArray: true,
+    filter: (user) => user.role === "staff",
+  });
 
-  const fetchStaffs = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await staffService.getAll();
-      setStaffs(data);
-    } catch (err) {
-      console.error("Error fetching staffs:", err);
-      setError("Failed to load staffs. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchStaffs();
-  }, []);
+  const staffs = (data as User[]) || [];
 
   // Calculate stats
   const stats = {
@@ -46,6 +30,14 @@ export default function StaffsPage() {
   };
 
   if (loading) {
+    const skeletonCardKeys = [
+      "stats-total",
+      "stats-active",
+      "stats-pending",
+      "stats-inactive",
+    ];
+    const skeletonRowKeys = ["row-1", "row-2", "row-3", "row-4", "row-5"];
+
     return (
       <div className="container mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
         <div className="space-y-2">
@@ -53,8 +45,8 @@ export default function StaffsPage() {
           <Skeleton className="h-4 w-full sm:w-96" />
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i}>
+          {skeletonCardKeys.map((key) => (
+            <Card key={key}>
               <CardHeader className="pb-2">
                 <Skeleton className="h-4 w-20" />
               </CardHeader>
@@ -70,8 +62,8 @@ export default function StaffsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="h-16 w-full" />
+              {skeletonRowKeys.map((key) => (
+                <Skeleton key={key} className="h-16 w-full" />
               ))}
             </div>
           </CardContent>
@@ -86,16 +78,12 @@ export default function StaffsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-red-600">Error</CardTitle>
-            <CardDescription>{error}</CardDescription>
+            <CardDescription>
+              {error instanceof Error
+                ? error.message
+                : "Failed to load staffs. Please try again."}
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <button
-              onClick={fetchStaffs}
-              className="text-blue-600 hover:text-blue-800 underline"
-            >
-              Try again
-            </button>
-          </CardContent>
         </Card>
       </div>
     );
@@ -165,7 +153,7 @@ export default function StaffsPage() {
       </div>
 
       {/* Staffs Table */}
-      <StaffsTable staffs={staffs} onRefresh={fetchStaffs} />
+      <StaffsTable staffs={staffs} onRefresh={() => {}} />
     </div>
   );
 }

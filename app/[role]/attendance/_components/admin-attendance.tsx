@@ -10,7 +10,8 @@ import {
 import { Loader2 } from "lucide-react";
 import { motion } from "motion/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { attendanceService, staffService } from "@/lib/services";
+import { attendanceService } from "@/lib/services";
+import { useFirebaseRealtime } from "@/hooks/use-firebase-realtime";
 import { AttendanceCard } from "./attendance-card";
 import type { Attendance } from "@/lib/types/attendance.type";
 import type { User as UserType } from "@/lib/types/user.type";
@@ -41,18 +42,14 @@ export const AdminAttendance = forwardRef<
   AdminAttendanceProps
 >(({ selectedStaffId }, ref) => {
   const [records, setRecords] = useState<Attendance[]>([]);
-  const [staffs, setStaffs] = useState<UserType[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const loadStaffs = useCallback(async () => {
-    try {
-      const data = await staffService.getAll();
-      setStaffs(data);
-    } catch (error) {
-      console.error("Failed to load staffs:", error);
-      toast.error("Failed to load staffs");
-    }
-  }, []);
+  const { data: staffsData } = useFirebaseRealtime<UserType>("users", {
+    asArray: true,
+    filter: (user) => user.role === "staff",
+  });
+
+  const staffs = (staffsData as UserType[]) || [];
 
   const loadRecords = useCallback(async () => {
     try {
@@ -73,10 +70,6 @@ export const AdminAttendance = forwardRef<
   }, [selectedStaffId]);
 
   useEffect(() => {
-    loadStaffs();
-  }, [loadStaffs]);
-
-  useEffect(() => {
     loadRecords();
   }, [loadRecords]);
 
@@ -84,11 +77,10 @@ export const AdminAttendance = forwardRef<
     ref,
     () => ({
       refetch: () => {
-        loadStaffs();
         loadRecords();
       },
     }),
-    [loadStaffs, loadRecords],
+    [loadRecords],
   );
 
   const getStaffInfo = (staffId: string) => {

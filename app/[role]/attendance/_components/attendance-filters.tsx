@@ -1,7 +1,7 @@
 "use client";
 
-import { CalendarIcon } from "lucide-react";
-import { format, parse, isValid } from "date-fns";
+import { CalendarIcon, Users } from "lucide-react";
+import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -9,9 +9,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { StaffSelector } from "./staff-selector";
+import { Autocomplete, type AutocompleteOption } from "@/components/core/autocomplete";
 import type { User } from "@/lib/types/user.type";
 import { cn } from "@/lib/utils";
+import { useMemo } from "react";
 
 interface AttendanceFiltersProps {
   selectedDate: Date;
@@ -32,6 +33,19 @@ export function AttendanceFilters({
   onStaffSelect,
   onCalendarOpenChange,
 }: AttendanceFiltersProps) {
+  const staffOptions = useMemo<AutocompleteOption[]>(() => {
+    const options: AutocompleteOption[] = [
+      { value: "all", label: "All Staff" },
+    ];
+    staffs.forEach((staff) => {
+      options.push({
+        value: staff.uid,
+        label: staff.name,
+      });
+    });
+    return options;
+  }, [staffs]);
+
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:flex-1 lg:flex-initial min-w-0">
       <Popover open={calendarOpen} onOpenChange={onCalendarOpenChange}>
@@ -57,11 +71,12 @@ export function AttendanceFilters({
         </PopoverContent>
       </Popover>
       <div className="w-full sm:w-1/2 lg:w-[240px] min-w-0">
-        <StaffSelector
-          staffs={staffs}
-          selectedStaffId={selectedStaffId || "all"}
-          onSelect={onStaffSelect}
+        <Autocomplete
+          options={staffOptions}
+          value={selectedStaffId || "all"}
+          onChange={onStaffSelect}
           placeholder="Select staff"
+          emptyMessage="No staff found."
           className="w-full"
         />
       </div>

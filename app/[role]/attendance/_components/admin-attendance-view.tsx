@@ -4,10 +4,9 @@ import { format, isValid, parse } from "date-fns";
 import { BarChart3, List, MapPin } from "lucide-react";
 import { motion } from "motion/react";
 import { parseAsString, useQueryState, useQueryStates } from "nuqs";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
+import { useCallback, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { staffService } from "@/lib/services";
+import { useFirebaseRealtime } from "@/hooks/use-firebase-realtime";
 import type { User } from "@/lib/types/user.type";
 import { AdminAttendance } from "./admin-attendance";
 import { AdminAttendanceAnalytics } from "./admin-attendance-analytics";
@@ -25,9 +24,14 @@ const tabs = [
 type TabId = (typeof tabs)[number]["id"];
 
 export function AdminAttendanceView() {
-  const [refetchKey, setRefetchKey] = useState(0);
-  const [staffs, setStaffs] = useState<User[]>([]);
   const [calendarOpen, setCalendarOpen] = useState(false);
+
+  const { data: staffsData } = useFirebaseRealtime<User>("users", {
+    asArray: true,
+    filter: (user) => user.role === "staff",
+  });
+
+  const staffs = (staffsData as User[]) || [];
 
   const [activeTab, setActiveTab] = useQueryState(
     "tab",
@@ -69,24 +73,6 @@ export function AdminAttendanceView() {
     [setDateStr],
   );
 
-  const loadStaffs = useCallback(async () => {
-    try {
-      const data = await staffService.getAll();
-      setStaffs(data);
-    } catch (error) {
-      console.error("Failed to load staffs:", error);
-      toast.error("Failed to load staffs");
-    }
-  }, []);
-
-  useEffect(() => {
-    loadStaffs();
-  }, [loadStaffs]);
-
-  const analyticsRef = useRef<{ refetch: () => void }>(null);
-  const mapRef = useRef<{ refetch: () => void }>(null);
-  const listRef = useRef<{ refetch: () => void }>(null);
-  const chartsRef = useRef<{ refetch: () => void }>(null);
 
   const handleResetFilters = () => {
     // Clear all filter query params (keeps tab)
@@ -97,30 +83,9 @@ export function AdminAttendanceView() {
     });
   };
 
-  const handleRefetch = () => {
-    analyticsRef.current?.refetch();
-    loadStaffs(); // Reload staffs list
-    const tab = activeTab || "map";
-    switch (tab) {
-      case "map":
-        mapRef.current?.refetch();
-        break;
-      case "list":
-        listRef.current?.refetch();
-        break;
-      case "charts":
-        chartsRef.current?.refetch();
-        break;
-    }
-    setRefetchKey((prev) => prev + 1);
-  };
-
   return (
     <div className="container mx-auto p-4 sm:p-6 max-w-7xl space-y-6">
-      <AdminAttendanceAnalytics
-        ref={analyticsRef}
-        key={`analytics-${refetchKey}`}
-      />
+      <AdminAttendanceAnalytics />
 
       <Tabs
         value={activeTab || "map"}
@@ -140,20 +105,21 @@ export function AdminAttendanceView() {
             })}
           </TabsList>
 
-          <AttendanceFilters
-            selectedDate={selectedDate}
-            selectedStaffId={selectedStaffId || "all"}
-            staffs={staffs}
-            calendarOpen={calendarOpen}
-            onDateSelect={handleDateSelect}
-            onStaffSelect={setSelectedStaffId}
-            onCalendarOpenChange={setCalendarOpen}
-          />
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:flex-1 lg:flex-initial min-w-0">
+            <AttendanceFilters
+              selectedDate={selectedDate}
+              selectedStaffId={selectedStaffId || "all"}
+              staffs={staffs}
+              calendarOpen={calendarOpen}
+              onDateSelect={handleDateSelect}
+              onStaffSelect={setSelectedStaffId}
+              onCalendarOpenChange={setCalendarOpen}
+            />
 
-          <AttendanceActions
-            onResetFilters={handleResetFilters}
-            onRefetch={handleRefetch}
-          />
+            <AttendanceActions
+              onResetFilters={handleResetFilters}
+            />
+          </div>
         </div>
 
         <TabsContent value="map" className="mt-0">
@@ -165,8 +131,6 @@ export function AdminAttendanceView() {
             transition={{ duration: 0.2 }}
           >
             <AdminAttendanceMap
-              ref={mapRef}
-              key={`map-${refetchKey}`}
               selectedStaffId={selectedStaffId || "all"}
               dateStr={dateStr || format(new Date(), "yyyy-MM-dd")}
             />
@@ -182,8 +146,6 @@ export function AdminAttendanceView() {
             transition={{ duration: 0.2 }}
           >
             <AdminAttendance
-              ref={listRef}
-              key={`list-${refetchKey}`}
               selectedStaffId={selectedStaffId || "all"}
             />
           </motion.div>
@@ -198,8 +160,6 @@ export function AdminAttendanceView() {
             transition={{ duration: 0.2 }}
           >
             <AdminAttendanceCharts
-              ref={chartsRef}
-              key={`charts-${refetchKey}`}
               selectedStaffId={selectedStaffId || "all"}
               dateStr={dateStr || format(new Date(), "yyyy-MM-dd")}
             />
