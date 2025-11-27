@@ -19,7 +19,7 @@ import {
   FileCode,
   ExternalLink,
 } from "lucide-react";
-import type { MarketingSite } from "@/lib/marketing-config";
+import type { MarketingSite } from "@/lib/config/marketing";
 import { cn } from "@/lib/utils";
 
 const iconMap = {

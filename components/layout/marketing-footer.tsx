@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { marketingSite } from "@/lib/marketing-config";
+import { marketingSite } from "@/lib/config/marketing";
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
 import {
