@@ -5,9 +5,14 @@ importScripts("https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"
 importScripts("https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js");
 
 let messaging = null;
+let isInitialized = false;
 
 // Initialize Firebase and messaging
 async function initializeFirebase() {
+  if (isInitialized && messaging) {
+    return;
+  }
+
   try {
     const response = await fetch("/api/firebase-config");
     const config = await response.json();
@@ -19,6 +24,7 @@ async function initializeFirebase() {
 
     messaging = firebase.messaging();
     console.log("[firebase-messaging-sw.js] Messaging initialized");
+    isInitialized = true;
 
     // Set up message handlers
     setupMessageHandlers();
@@ -30,6 +36,7 @@ async function initializeFirebase() {
 // Set up message handlers
 function setupMessageHandlers() {
   if (!messaging) {
+    console.warn("[firebase-messaging-sw.js] Messaging not available");
     return;
   }
 
@@ -38,26 +45,64 @@ function setupMessageHandlers() {
     console.log("[firebase-messaging-sw.js] Received background message ", payload);
 
     const notificationTitle = payload.notification?.title || "Notification";
+    const notificationBody = payload.notification?.body || "";
+    
+    console.log("[firebase-messaging-sw.js] Preparing to show notification:", {
+      title: notificationTitle,
+      body: notificationBody,
+    });
+
+    const clickAction = payload.data?.url || 
+                        payload.fcmOptions?.link || 
+                        payload.webpush?.fcmOptions?.link || 
+                        "/";
+
+    // Handle icon path - use .svg if .png is requested and doesn't exist
+    let iconPath = payload.notification?.icon || "/icon.svg";
+    if (iconPath === "/icon.png") {
+      iconPath = "/icon.svg"; // Fallback to .svg if .png was requested
+    }
+
     const notificationOptions = {
-      body: payload.notification?.body || "",
-      icon: payload.notification?.icon || "/icon.png",
-      badge: payload.notification?.badge || "/badge.png",
+      body: notificationBody,
+      icon: iconPath,
+      badge: "/badge.svg",
       image: payload.notification?.image,
-      tag: payload.notification?.tag,
+      tag: payload.notification?.tag || `notification-${Date.now()}`,
       requireInteraction: false,
       data: {
-        ...payload.data,
-        ...(payload.fcmOptions?.link && { url: payload.fcmOptions.link }),
+        url: clickAction,
+        ...(payload.data || {}),
       },
     };
 
-    return self.registration.showNotification(notificationTitle, notificationOptions);
+    console.log("[firebase-messaging-sw.js] Notification options:", notificationOptions);
+
+    // Ensure registration is available before showing notification
+    if (self.registration) {
+      console.log("[firebase-messaging-sw.js] Service worker registration available, showing notification");
+      return self.registration.showNotification(notificationTitle, notificationOptions)
+        .then(() => {
+          console.log("[firebase-messaging-sw.js] Notification shown successfully");
+        })
+        .catch((error) => {
+          console.error("[firebase-messaging-sw.js] Failed to show notification:", error);
+        });
+    } else {
+      console.error("[firebase-messaging-sw.js] Service worker registration not available");
+    }
   });
 }
 
 // Initialize on service worker activation
 self.addEventListener("activate", (event) => {
   event.waitUntil(initializeFirebase());
+});
+
+// Initialize immediately on install
+self.addEventListener("install", (event) => {
+  event.waitUntil(initializeFirebase());
+  self.skipWaiting();
 });
 
 // Handle notification clicks
@@ -85,7 +130,5 @@ self.addEventListener("notificationclick", (event) => {
   );
 });
 
-// Initialize immediately if possible
-if (self.registration) {
-  initializeFirebase();
-}
+// Initialize immediately
+initializeFirebase();

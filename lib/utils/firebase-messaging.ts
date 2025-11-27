@@ -145,7 +145,13 @@ export async function initializeMessaging(userId: string): Promise<string | null
  * Listen for foreground messages
  */
 export function onForegroundMessage(
-  callback: (payload: { notification?: NotificationPayload }) => void
+  callback: (payload: {
+    notification?: NotificationPayload;
+    data?: Record<string, string>;
+    fcmOptions?: { link?: string };
+    from?: string;
+    messageId?: string;
+  }) => void
 ): (() => void) | null {
   if (typeof window === "undefined") {
     return null;

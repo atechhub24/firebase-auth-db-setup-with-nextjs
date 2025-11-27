@@ -14,6 +14,7 @@ import {
   initializeMessaging,
   onForegroundMessage,
 } from "@/lib/utils/firebase-messaging";
+import { toast } from "sonner";
 
 interface FirebaseProviderProps {
   children: React.ReactNode;
@@ -27,6 +28,10 @@ export function FirebaseProvider({ children }: FirebaseProviderProps) {
   useAuthGuard(["/signin"]);
 
   useEffect(() => {
+    let unsubscribeAuth: (() => void) | null = null;
+    let unsubscribeUser: (() => void) | null = null;
+    let unsubscribeForeground: (() => void) | null = null;
+
     try {
       // Initialize @atechhub/firebase auth
       configureAuth(firebaseAuthConfig);
@@ -44,11 +49,21 @@ export function FirebaseProvider({ children }: FirebaseProviderProps) {
         });
       }
 
-      onAuthStateChanged(auth, async (loggedInUser) => {
+      unsubscribeAuth = onAuthStateChanged(auth, async (loggedInUser) => {
+        // Cleanup previous subscriptions
+        if (unsubscribeUser) {
+          unsubscribeUser();
+          unsubscribeUser = null;
+        }
+        if (unsubscribeForeground) {
+          unsubscribeForeground();
+          unsubscribeForeground = null;
+        }
+
         if (loggedInUser?.uid) {
           // fetch data and update store
           const userRef = ref(database, `users/${loggedInUser.uid}`);
-          onValue(userRef, async (snap) => {
+          unsubscribeUser = onValue(userRef, async (snap) => {
             const userData = snap.val();
             if (userData) {
               setUser(userData);
@@ -63,10 +78,80 @@ export function FirebaseProvider({ children }: FirebaseProviderProps) {
                   }
 
                   // Set up foreground message listener
-                  onForegroundMessage((payload) => {
+                  unsubscribeForeground = onForegroundMessage((payload) => {
                     console.log("Foreground message received:", payload);
-                    // You can show a custom notification UI here if needed
-                    // Or let the service worker handle it
+
+                    const notificationTitle =
+                      payload.notification?.title || "Notification";
+                    const notificationBody = payload.notification?.body || "";
+                    const clickAction =
+                      payload.data?.url || payload.fcmOptions?.link;
+
+                    // Show custom UI notification using Sonner toast
+                    toast.custom(
+                      (t) => (
+                        <button
+                          type="button"
+                          className="w-full max-w-md rounded-lg border bg-card shadow-lg p-4 text-left cursor-pointer hover:shadow-xl transition-shadow"
+                          onClick={() => {
+                            toast.dismiss(t);
+                            if (clickAction) {
+                              window.location.href = clickAction;
+                            }
+                          }}
+                        >
+                          <div className="flex items-start gap-3">
+                            {payload.notification?.icon && (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={payload.notification.icon}
+                                alt=""
+                                className="h-10 w-10 rounded-full object-cover flex-shrink-0"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = "none";
+                                }}
+                              />
+                            )}
+                            <div className="flex-1 space-y-1 min-w-0">
+                              <div className="flex items-center justify-between gap-2">
+                                <p className="text-sm font-semibold text-card-foreground truncate">
+                                  {notificationTitle}
+                                </p>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toast.dismiss(t);
+                                  }}
+                                  className="text-muted-foreground hover:text-foreground flex-shrink-0 text-xs"
+                                  aria-label="Close notification"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                              <p className="text-sm text-muted-foreground line-clamp-2">
+                                {notificationBody}
+                              </p>
+                              {payload.notification?.image && (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={payload.notification.image}
+                                  alt=""
+                                  className="mt-2 w-full rounded-md object-cover max-h-32"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = "none";
+                                  }}
+                                />
+                              )}
+                            </div>
+                          </div>
+                        </button>
+                      ),
+                      {
+                        duration: 5000,
+                        position: "top-right",
+                      }
+                    );
                   });
                 } catch (error) {
                   console.error("Failed to initialize messaging:", error);
@@ -86,6 +171,19 @@ export function FirebaseProvider({ children }: FirebaseProviderProps) {
       console.error("Failed to initialize Firebase:", error);
       setIsInitializing(false);
     }
+
+    // Cleanup function
+    return () => {
+      if (unsubscribeForeground) {
+        unsubscribeForeground();
+      }
+      if (unsubscribeUser) {
+        unsubscribeUser();
+      }
+      if (unsubscribeAuth) {
+        unsubscribeAuth();
+      }
+    };
   }, [setUser]);
 
   if (isInitializing) {

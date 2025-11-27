@@ -71,8 +71,8 @@ class NotificationService {
         notification: {
           title: payload.title,
           body: payload.body,
-          icon: payload.icon || "/icon.png",
-          badge: payload.badge || "/badge.png",
+          icon: payload.icon || "/icon.svg",
+          badge: payload.badge || "/badge.svg",
           ...(payload.image && { image: payload.image }),
           ...(payload.tag && { tag: payload.tag }),
           ...(payload.sound && { sound: payload.sound }),
