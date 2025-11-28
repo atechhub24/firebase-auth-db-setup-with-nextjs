@@ -82,5 +82,5 @@ export default function EditBlogPage() {
     );
   }
 
-  return <BlogForm blog={blog} />;
+  return <BlogForm blog={blog ?? undefined} />;
 }

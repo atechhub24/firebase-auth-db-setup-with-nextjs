@@ -30,7 +30,7 @@ const sendNotificationSchema = z.object({
     sound: z.string().optional(),
     tag: z.string().optional(),
     badge: z.string().optional(),
-    data: z.record(z.string()).optional(),
+    data: z.record(z.string(), z.string()).optional(),
   }),
 });
 
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
         {
           success: false,
           error: "Invalid request data",
-          details: validationResult.error.errors,
+          details: validationResult.error.issues,
         },
         { status: 400 }
       );

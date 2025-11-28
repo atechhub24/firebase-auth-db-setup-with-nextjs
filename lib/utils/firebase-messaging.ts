@@ -1,9 +1,8 @@
 "use client";
 
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import { getMessaging, getToken, onMessage, type MessagePayload } from "firebase/messaging";
 import { getApp } from "firebase/app";
 import { firebaseConfig, firebaseVapidConfig } from "@/lib/env";
-import type { NotificationPayload } from "@/lib/types/notification.type";
 
 let messaging: ReturnType<typeof getMessaging> | null = null;
 
@@ -145,13 +144,7 @@ export async function initializeMessaging(userId: string): Promise<string | null
  * Listen for foreground messages
  */
 export function onForegroundMessage(
-  callback: (payload: {
-    notification?: NotificationPayload;
-    data?: Record<string, string>;
-    fcmOptions?: { link?: string };
-    from?: string;
-    messageId?: string;
-  }) => void
+  callback: (payload: MessagePayload) => void
 ): (() => void) | null {
   if (typeof window === "undefined") {
     return null;

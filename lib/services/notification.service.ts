@@ -94,7 +94,7 @@ class NotificationService {
         },
       },
       android: {
-        priority: payload.priority === "high" ? "high" : "normal",
+        priority: (payload.priority === "high" ? "high" : "normal") as "normal" | "high",
         notification: {
           sound: payload.sound || "default",
           ...(payload.image && { imageUrl: payload.image }),

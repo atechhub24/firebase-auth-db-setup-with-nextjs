@@ -188,10 +188,11 @@ export function MultiSelectAutocomplete({
                 <div className="space-y-1">
                   {filteredOptions.map((option, index) => {
                     const selected = isSelected(option.value);
-                    const isDisabled =
+                    const isDisabled = !!(
                       maxSelected &&
                       !selected &&
-                      value.length >= maxSelected;
+                      value.length >= maxSelected
+                    );
 
                     return (
                       <motion.button

@@ -47,9 +47,9 @@ const notificationSchema = z.object({
   image: z.string().url("Invalid URL").optional().or(z.literal("")),
   icon: z.string().url("Invalid URL").optional().or(z.literal("")),
   clickAction: z.string().url("Invalid URL").optional().or(z.literal("")),
-  priority: z.enum(["normal", "high"]).default("normal"),
+  priority: z.enum(["normal", "high"]),
   sound: z.string().optional(),
-  enableSound: z.boolean().default(false),
+  enableSound: z.boolean(),
 });
 
 type NotificationFormData = z.infer<typeof notificationSchema>;

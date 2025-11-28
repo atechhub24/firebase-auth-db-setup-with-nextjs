@@ -17,17 +17,26 @@ import { BlogCard } from "../_components/blog-card";
 import { motion, AnimatePresence } from "motion/react";
 import { staggerContainer } from "@/lib/utils/motion-variants";
 
+const SKELETON_KEYS = [
+  "skeleton-1",
+  "skeleton-2",
+  "skeleton-3",
+  "skeleton-4",
+  "skeleton-5",
+];
+
 export default function BlogDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
 
-  const { data: allBlogsData, loading, error } = useFirebaseRealtime<Blog>(
-    "blogs",
-    {
-      asArray: true,
-      filter: (blog) => blog.status === "published",
-    },
-  );
+  const {
+    data: allBlogsData,
+    loading,
+    error,
+  } = useFirebaseRealtime<Blog>("blogs", {
+    asArray: true,
+    filter: (blog) => blog.status === "published",
+  });
 
   const allBlogs = (allBlogsData as Blog[]) || [];
 
@@ -48,8 +57,8 @@ export default function BlogDetailPage() {
         <Skeleton className="h-8 w-full mb-4" />
         <Skeleton className="h-64 w-full mb-6" />
         <div className="space-y-4">
-          {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="h-4 w-full" />
+          {SKELETON_KEYS.map((key) => (
+            <Skeleton key={key} className="h-4 w-full" />
           ))}
         </div>
       </div>
@@ -69,7 +78,9 @@ export default function BlogDetailPage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                {error instanceof Error ? error.message : "Failed to load blog. Please try again."}
+                {error instanceof Error
+                  ? error.message
+                  : "Failed to load blog. Please try again."}
               </p>
               <Link href="/blogs">
                 <Button variant="outline" className="mt-4">
@@ -93,7 +104,9 @@ export default function BlogDetailPage() {
         >
           <Card>
             <CardHeader>
-              <h2 className="text-xl font-semibold text-red-600">Blog not found</h2>
+              <h2 className="text-xl font-semibold text-red-600">
+                Blog not found
+              </h2>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
@@ -149,10 +162,10 @@ export default function BlogDetailPage() {
             className="flex flex-wrap items-center gap-2"
           >
             <Badge variant="outline" className="capitalize">
-              {blog.category}
+              {blog!.category}
             </Badge>
             <AnimatePresence>
-              {blog.tags?.map((tag, index) => (
+              {blog!.tags?.map((tag, index) => (
                 <motion.div
                   key={tag}
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -175,7 +188,7 @@ export default function BlogDetailPage() {
             transition={{ delay: 0.3 }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight"
           >
-            {blog.title}
+            {blog!.title}
           </motion.h1>
 
           <motion.p
@@ -184,7 +197,7 @@ export default function BlogDetailPage() {
             transition={{ delay: 0.35 }}
             className="text-lg md:text-xl text-muted-foreground"
           >
-            {blog.excerpt}
+            {blog!.excerpt}
           </motion.p>
 
           <motion.div
@@ -195,19 +208,19 @@ export default function BlogDetailPage() {
           >
             <div className="flex items-center gap-2">
               <User className="h-4 w-4" />
-              {blog.author}
+              {blog!.author}
             </div>
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              {blog.publishedAt
-                ? formatBlogDate(blog.publishedAt)
-                : formatBlogDate(blog.createdAt)}
+              {blog!.publishedAt
+                ? formatBlogDate(blog!.publishedAt)
+                : formatBlogDate(blog!.createdAt)}
             </div>
           </motion.div>
         </div>
 
         {/* Cover Image */}
-        {blog.coverImage && (
+        {blog!.coverImage && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -215,8 +228,8 @@ export default function BlogDetailPage() {
             className="relative w-full h-64 sm:h-96 rounded-lg overflow-hidden shadow-2xl"
           >
             <img
-              src={blog.coverImage}
-              alt={blog.title}
+              src={blog!.coverImage}
+              alt={blog!.title}
               className="w-full h-full object-cover"
             />
           </motion.div>
@@ -229,7 +242,7 @@ export default function BlogDetailPage() {
           transition={{ delay: 0.5 }}
           className="prose prose-lg dark:prose-invert max-w-none"
         >
-          <RichTextRenderer content={blog.content} />
+          <RichTextRenderer content={blog!.content} />
         </motion.div>
       </motion.article>
 
